@@ -45,86 +45,86 @@
 // CTRL Register
 struct CTRL_Register
 {
-	unsigned int Address;	// bits 14-12
-	unsigned int DTIME;		// bits 11-10
-	unsigned int ISGAIN;	// bits 9-8
-	unsigned int EXSTALL;	// bit 7
-	unsigned int MODE;		// bits 6-3
-	unsigned int RSTEP;		// bit 2
-	unsigned int RDIR;		// bit 1
-	unsigned int ENBL;		// bit 0
+    unsigned int Address;   // Bits 14-12
+    unsigned int DTIME;     // Bits 11-10
+    unsigned int ISGAIN;    // Bits 9-8
+    unsigned int EXSTALL;   // Bit 7
+    unsigned int MODE;      // Bits 6-3
+    unsigned int RSTEP;     // Bit 2
+    unsigned int RDIR;      // Bit 1
+    unsigned int ENBL;      // Bit 0
 };
 
 // TORQUE Register
 struct TORQUE_Register
 {
-	unsigned int Address;	// bits 14-12
-	/* Reserved */ 			// bit 11
-	unsigned int SIMPLTH;  	// bits 10-8
-	unsigned int TORQUE;	// bits 7-0
+    unsigned int Address;   // Bits 14-12
+    /* Reserved */          // Bit 11
+    unsigned int SIMPLTH;   // Bits 10-8
+    unsigned int TORQUE;    // Bits 7-0
 };
 
 // OFF Register
 struct OFF_Register
 {
-	unsigned int Address;	// bits 14-12
-	/* Reserved */ 			// bits 11-9
-	unsigned int PWMMODE;  	// bit 8
-	unsigned int TOFF;		// bits 7-0
+    unsigned int Address;   // Bits 14-12
+    /* Reserved */          // Bits 11-9
+    unsigned int PWMMODE;   // Bit 8
+    unsigned int TOFF;      // Bits 7-0
 };
 
 // BLANK Register
 struct BLANK_Register
 {
-	unsigned int Address;	// bits 14-12
-	/* Reserved */ 			// bits 11-9
-	unsigned int ABT;  		// bit 8
-	unsigned int TBLANK;	// bits 7-0
+    unsigned int Address;   // Bits 14-12
+    /* Reserved */          // Bits 11-9
+    unsigned int ABT;       // Bit 8
+    unsigned int TBLANK;    // Bits 7-0
 };
 
 // DECAY Register
 struct DECAY_Register
 {
-	unsigned int Address;	// bits 14-12
-	/* Reserved */ 			// bit 11
-	unsigned int DECMOD;  	// bits 10-8
-	unsigned int TDECAY;	// bits 7-0
+    unsigned int Address;   // Bits 14-12
+    /* Reserved */          // Bit 11
+    unsigned int DECMOD;    // Bits 10-8
+    unsigned int TDECAY;    // Bits 7-0
 };
 
 // STALL Register
 struct STALL_Register
 {
-	unsigned int Address;	// bits 14-12
-	unsigned int VDIV;  	// bits 11-10
-	unsigned int SDCNT;		// bits 9-8
-	unsigned int SDTHR;		// bits 7-0
+    unsigned int Address;   // Bits 14-12
+    unsigned int VDIV;      // Bits 11-10
+    unsigned int SDCNT;     // Bits 9-8
+    unsigned int SDTHR;     // Bits 7-0
 };
 
 // DRIVE Register
 struct DRIVE_Register
 {
-	unsigned int Address;	// bits 14-12
-	unsigned int IDRIVEP;  	// bits 11-10
-	unsigned int IDRIVEN;	// bits 9-8
-	unsigned int TDRIVEP;	// bits 7-6
-	unsigned int TDRIVEN;	// bits 5-4
-	unsigned int OCPDEG;	// bits 3-2
-	unsigned int OCPTH;		// bits 1-0
+    unsigned int Address;   // Bits 14-12
+    unsigned int IDRIVEP;   // Bits 11-10
+    unsigned int IDRIVEN;   // Bits 9-8
+    unsigned int TDRIVEP;   // Bits 7-6
+    unsigned int TDRIVEN;   // Bits 5-4
+    unsigned int OCPDEG;    // Bits 3-2
+    unsigned int OCPTH;     // Bits 1-0
 };
 
 // STATUS Register
 struct STATUS_Register
 {
-	unsigned int Address;	// bits 14-12
-	/* Reserved */			// bits 11-8
-	unsigned int STDLAT;  	// bit 7
-	unsigned int STD;		// bit 6
-	unsigned int UVLO;		// bit 5
-	unsigned int BPDF;		// bit 4
-	unsigned int APDF;		// bit 3
-	unsigned int BOCP;		// bit 2
-	unsigned int AOCP;		// bit 1
-	unsigned int OTS;		// bit 0
+    unsigned int Address;   // Bits 14-12
+    /* Reserved */          // Bits 11-8
+    unsigned int STDLAT;    // Bit 7
+    unsigned int STD;       // Bit 6
+    unsigned int UVLO;      // Bit 5
+    unsigned int BPDF;      // Bit 4
+    unsigned int APDF;      // Bit 3
+    unsigned int BOCP;      // Bit 2
+    unsigned int AOCP;      // Bit 1
+    unsigned int OTS;       // Bit 0
 };
 
 #endif /* REGISTERS_H_ */

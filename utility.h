@@ -50,37 +50,60 @@
 
 // GPIO Port 1 Definitions
 #define POT         BIT0    // P1.0
-#define nSLEEP		BIT4    // P1.4
+#define nSLEEP      BIT4    // P1.4
 
 // GPIO Port 2 Definitions
-#define RESET		BIT0    // P2.0
-#define STEP_AIN1	BIT1    // P2.1
-#define DIR_AIN2	BIT2    // P2.2
-#define BIN2		BIT4    // P2.4
-#define	BIN1		BIT5    // P2.5
-#define nSTALL		BIT6    // P2.6
-#define nFAULT		BIT7    // P2.7
+#define RESET       BIT0    // P2.0
+#define STEP_AIN1   BIT1    // P2.1
+#define DIR_AIN2    BIT2    // P2.2
+#define BIN2        BIT4    // P2.4
+#define	BIN1        BIT5    // P2.5
+#define nSTALL      BIT6    // P2.6
+#define nFAULT      BIT7    // P2.7
 
 // SPI Port Definitions
-#define CS			BIT3    // P2.3
-#define SCLK		BIT5    // SCLK
-#define SDATO		BIT6    // MISO
-#define SDATI		BIT7    // MOSI
+#define CS          BIT3    // P2.3
+#define SCLK        BIT5    // SCLK
+#define SDATO       BIT6    // MISO
+#define SDATI       BIT7    // MOSI
 
 // Register Access
 #define REGWRITE    0x00
 #define REGREAD     0x80
 
 // Default Defines
-#define	DEFAULT_START_STOP_SPEED	128		 	// Initial speed of the motor (PPS)
-#define DEFAULT_TARGET_SPEED        512 		// Target speed of the motor (PPS)
-#define DEFAULT_ACCEL_RATE		    128			// Acceleration/deceleration rate (PPSPS)
+#define	DEFAULT_START_STOP_SPEED    128         // Initial speed of the motor (PPS)
+#define DEFAULT_TARGET_SPEED        512         // Target speed of the motor (PPS)
+#define DEFAULT_ACCEL_RATE          128         // Acceleration/deceleration rate (PPSPS)
 #define DEFAULT_NUM_STEPS           1024        // Number of steps
 
 // Custom Types
-typedef enum {false, true} boolean;
-typedef enum {low, high} gpio;
-typedef enum {SPD_START, SPD_ACCEL, SPD_STABLE, SPD_DECEL, SPD_STOP, STP_START, STP_ACCEL, STP_STABLE, STP_DECEL, STP_STOP, HOLD} MotorState;
+typedef enum
+{
+    false,
+    true
+} boolean;
+
+typedef enum
+{
+    low,
+    high
+} gpio;
+
+typedef enum
+{
+    SPD_START,
+    SPD_ACCEL,
+    SPD_STABLE,
+    SPD_DECEL,
+    SPD_STOP,
+    STP_START,
+    STP_ACCEL,
+    STP_STABLE,
+    STP_DECEL,
+    STP_STOP,
+    HOLD
+} MotorState;
 
 /*****************************************************************************/
 
@@ -138,27 +161,28 @@ extern gpio G_nFAULT;                     // Logic low when in FAULT condition
 extern gpio G_nSTALL;                     // Logic low when in STALL condition
 
 // DRV8711 Registers
-extern struct CTRL_Register 	G_CTRL_REG;
-extern struct TORQUE_Register 	G_TORQUE_REG;
-extern struct OFF_Register 		G_OFF_REG;
-extern struct BLANK_Register	G_BLANK_REG;
-extern struct DECAY_Register 	G_DECAY_REG;
-extern struct STALL_Register 	G_STALL_REG;
-extern struct DRIVE_Register 	G_DRIVE_REG;
-extern struct STATUS_Register 	G_STATUS_REG;
+extern struct CTRL_Register     G_CTRL_REG;
+extern struct TORQUE_Register   G_TORQUE_REG;
+extern struct OFF_Register      G_OFF_REG;
+extern struct BLANK_Register    G_BLANK_REG;
+extern struct DECAY_Register    G_DECAY_REG;
+extern struct STALL_Register    G_STALL_REG;
+extern struct DRIVE_Register    G_DRIVE_REG;
+extern struct STATUS_Register   G_STATUS_REG;
 
 /*****************************************************************************/
 
 // Function Declarations
-void Initialize();
-void UpdateGPIO();
-void UpdateDRV8711Registers();
-void WriteAllRegisters();
-void ReadAllRegisters();
-void UpdateFullScaleCurrent();
-void UpdateStepperMotionProfile();
-void SpeedProfile();
-void StepProfile();
-unsigned int SPI_DRV8711_ReadWrite(unsigned char data_high, unsigned char data_low);
+void            Initialize ();
+void            UpdateGPIO ();
+void            UpdateDRV8711Registers ();
+void            WriteAllRegisters ();
+void            ReadAllRegisters ();
+void            UpdateFullScaleCurrent ();
+void            UpdateStepperMotionProfile ();
+void            SpeedProfile ();
+void            StepProfile ();
+unsigned int    SPI_DRV8711_ReadWrite   (unsigned char  data_high,
+                                         unsigned char  data_low);
 
 #endif /* UTILITY_H_ */

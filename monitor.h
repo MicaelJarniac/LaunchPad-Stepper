@@ -40,7 +40,7 @@
 #ifndef MONITOR_H_
 #define MONITOR_H_
 
-void ClearBufferRelatedParam();
-void receivedDataCommand(unsigned char d);
+void ClearBufferRelatedParam    ();
+void receivedDataCommand        (unsigned char d);
 
 #endif

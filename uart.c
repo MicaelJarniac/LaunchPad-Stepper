@@ -39,8 +39,8 @@
 
 unsigned int txData;
 
-void TimerA_UART_tx(unsigned char byte);
-extern void receivedDataCommand(unsigned char receiveData);
+void        TimerA_UART_tx      (unsigned char byte);
+extern void receivedDataCommand (unsigned char receiveData);
 
 /*******************************************************************************
  *
@@ -53,7 +53,8 @@ extern void receivedDataCommand(unsigned char receiveData);
  *! \return None
  *
  ******************************************************************************/
-void uartInit(void)
+void
+uartInit (void)
 {
 #if HARDWARE_UART
     /* P1.1 = RXD, P1.2=TXD */
@@ -97,7 +98,8 @@ void uartInit(void)
  *! \return None
  *
  ******************************************************************************/
-void uartTxByte(unsigned char byte)
+void
+uartTxByte (unsigned char byte)
 {
 #if HARDWARE_UART
     /* USCI_A0 TX buffer ready? */
@@ -106,7 +108,7 @@ void uartTxByte(unsigned char byte)
     UCA0TXBUF = byte;
 #else
     /* Transmit data packet */
-    TimerA_UART_tx(byte);
+    TimerA_UART_tx (byte);
 #endif
 }
 
@@ -120,7 +122,8 @@ void uartTxByte(unsigned char byte)
  *! \return None
  *
  ******************************************************************************/
-void TimerA_UART_tx(unsigned char byte)
+void
+TimerA_UART_tx (unsigned char byte)
 {
     while (TACCTL0 & CCIE);                 // Ensure last char got TX'd
     TACCR0 = TAR;                           // Current state of TA counter
@@ -141,7 +144,8 @@ void TimerA_UART_tx(unsigned char byte)
  *
  ******************************************************************************/
 #pragma vector = TIMER0_A0_VECTOR
-__interrupt void Timer_A0_ISR(void)
+__interrupt void
+Timer_A0_ISR (void)
 {
     static unsigned char txBitCnt = 10;
 
@@ -150,12 +154,10 @@ __interrupt void Timer_A0_ISR(void)
     {
         TACCTL0 &= ~CCIE;                   // All bits TXed, disable interrupt
         txBitCnt = 10;
-    }
-    else {
+    } else {
         if (txData & 0x01) {
             TACCTL0 &= ~OUTMOD2;            // TX Mark '1'
-        }
-        else {
+        } else {
             TACCTL0 |= OUTMOD2;             // TX Space '0'
         }
         txData >>= 1;
@@ -172,35 +174,35 @@ __interrupt void Timer_A0_ISR(void)
  *
  ******************************************************************************/
 #pragma vector = TIMER0_A1_VECTOR
-__interrupt void Timer_A1_ISR(void)
+__interrupt void
+Timer_A1_ISR (void)
 {
-    static unsigned char rxBitCnt = 8;
-    static unsigned char rxData = 0;
+    static unsigned char rxBitCnt   = 8;
+    static unsigned char rxData     = 0;
 
-    switch (__even_in_range(TA0IV, TA0IV_TAIFG)) { // Use calculated branching
-        case TA0IV_TACCR1:                        // TACCR1 CCIFG - UART RX
-            TACCR1 += UART_TBIT;                 // Add Offset to CCRx
-            if (TACCTL1 & CAP) {                 // Capture mode = start bit edge
-                TACCTL1 &= ~CAP;                 // Switch capture to compare mode
-                TACCR1 += UART_TBIT_DIV_2;       // Point CCRx to middle of D0
+    switch (__even_in_range (TA0IV, TA0IV_TAIFG)) { // Use calculated branching
+    case TA0IV_TACCR1:                        // TACCR1 CCIFG - UART RX
+        TACCR1 += UART_TBIT;                 // Add Offset to CCRx
+        if (TACCTL1 & CAP) {                 // Capture mode = start bit edge
+            TACCTL1 &= ~CAP;                 // Switch capture to compare mode
+            TACCR1 += UART_TBIT_DIV_2;       // Point CCRx to middle of D0
+        } else {
+            rxData >>= 1;
+            if (TACCTL1 & SCCI) {            // Get bit waiting in receive latch
+                rxData |= 0x80;
             }
-            else {
-                rxData >>= 1;
-                if (TACCTL1 & SCCI) {            // Get bit waiting in receive latch
-                    rxData |= 0x80;
-                }
-                rxBitCnt--;
-                if (rxBitCnt == 0) {             // All bits RXed?
-                    rxBitCnt = 8;                // Re-load bit counter
-                    TACCTL1 |= CAP;              // Switch compare to capture mode
+            rxBitCnt--;
+            if (rxBitCnt == 0) {             // All bits RXed?
+                rxBitCnt = 8;                // Re-load bit counter
+                TACCTL1 |= CAP;              // Switch compare to capture mode
 
-                    /* Parse received command immediately */
-                    receivedDataCommand(rxData);
+                /* Parse received command immediately */
+                receivedDataCommand(rxData);
 
-                    __bic_SR_register_on_exit(LPM0_bits);  // Clear LPM0 bits from 0(SR)
-                }
+                __bic_SR_register_on_exit(LPM0_bits);  // Clear LPM0 bits from 0(SR)
             }
-            break;
+        }
+        break;
     }
 }
 #endif
@@ -216,15 +218,16 @@ __interrupt void Timer_A1_ISR(void)
  *
  ******************************************************************************/
 #pragma vector=USCIAB0RX_VECTOR
-__interrupt void USCI0RX_ISR(void)
+__interrupt void
+USCI0RX_ISR (void)
 {
     /* USCI_A0 TX buffer ready? */
     while (!(IFG2&UCA0TXIFG));
 
     /* Parse received command immediately */
-    receivedDataCommand(UCA0RXBUF);
+    receivedDataCommand (UCA0RXBUF);
 
     /* clear LPM3 bits from 0(SR) */
-   __bic_SR_register_on_exit(LPM3_bits);
+   __bic_SR_register_on_exit (LPM3_bits);
 }
 #endif

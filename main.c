@@ -57,20 +57,20 @@
 #include "utility.h"
 
 // Main
-int main(void)
+int
+main (void)
 {
-	Initialize();
+    Initialize ();
 
-	while (1)
-	{
-		// Update Functions
-		UpdateGPIO();
-		UpdateDRV8711Registers();
-		UpdateFullScaleCurrent();
-		UpdateStepperMotionProfile();
+    while (1) {
+        // Update Functions
+        UpdateGPIO ();
+        UpdateDRV8711Registers ();
+        UpdateFullScaleCurrent ();
+        UpdateStepperMotionProfile ();
         // Enter LPM and wake up when needed
-        __bis_SR_register(LPM0_bits + GIE);
-	}
+        __bis_SR_register (LPM0_bits + GIE);
+    }
 }
 
 /****************************Interrupt Service Routines*****************************/
@@ -78,15 +78,17 @@ int main(void)
 #pragma vector=PORT1_VECTOR, PORT2_VECTOR, ADC10_VECTOR, \
         USCIAB0TX_VECTOR, TIMER0_A0_VECTOR, TIMER0_A1_VECTOR, \
         COMPARATORA_VECTOR, NMI_VECTOR
-__interrupt void Trap_ISR(void) {}
+__interrupt void
+Trap_ISR (void)
+{}
 
 
 #pragma vector=TIMER1_A0_VECTOR
-__interrupt void Timer1_A0(void)
+__interrupt void
+Timer1_A0 (void)
 {
     // Update Timer at End of PWM Period
-    if (G_LOAD_CCR_VALS == true)
-    {
+    if (G_LOAD_CCR_VALS == true) {
         G_CUR_SPEED = G_CUR_SPEED_TEMP;
         TA1CCR0 = G_TA1CCR0_TEMP;
         TA1CCR1 = G_TA1CCR1_TEMP;
@@ -95,43 +97,48 @@ __interrupt void Timer1_A0(void)
 }
 
 #pragma vector=TIMER1_A1_VECTOR
-__interrupt void Timer1_A1(void)
+__interrupt void
+Timer1_A1 (void)
 {
-    switch (TA1IV)
-    {
-        case TA1IV_NONE: break;         // Vector 0: No Interrupt
-        case TA1IV_TACCR1:              // Vector 2: CCR1 CCIFG
+    switch (TA1IV) {
+    case TA1IV_NONE:
+        break;                      // Vector 0: No Interrupt
+
+    case TA1IV_TACCR1:              // Vector 2: CCR1 CCIFG
+        // Increment Step Counter
+        G_CUR_NUM_STEPS++;
+        if (G_CUR_NUM_STEPS == G_TOTAL_NUM_STEPS)
         {
-            // Increment Step Counter
-            G_CUR_NUM_STEPS++;
-            if (G_CUR_NUM_STEPS == G_TOTAL_NUM_STEPS)
-            {
-                __bic_SR_register_on_exit(LPM0_bits);
-            }
-            TA1CCTL1 &= ~CCIFG;
-            break;
+            __bic_SR_register_on_exit (LPM0_bits);
         }
-        case TA1IV_TACCR2:              // Vector 4: CCR2 CCIFG
-        {
-            TA1CCTL2 &= ~CCIFG;
-            break;
-        }
-        case TA1IV_6: break;            // Vector 6: Reserved CCIFG
-        case TA1IV_8: break;            // Vector 8: Reserved CCIFG
-        case TA1IV_TAIFG:               // Vector 10: Overflow
-        {
-            TACTL &= ~TAIFG;
-            break;
-        }
-        default: break;
+        TA1CCTL1 &= ~CCIFG;
+        break;
+
+    case TA1IV_TACCR2:              // Vector 4: CCR2 CCIFG
+        TA1CCTL2 &= ~CCIFG;
+        break;
+
+    case TA1IV_6:
+        break;                      // Vector 6: Reserved CCIFG
+
+    case TA1IV_8:
+        break;                      // Vector 8: Reserved CCIFG
+
+    case TA1IV_TAIFG:               // Vector 10: Overflow
+        TACTL &= ~TAIFG;
+        break;
+
+    default:
+        break;
     }
 }
 
 #pragma vector=WDT_VECTOR
-__interrupt void WatchDog_Timer(void)
+__interrupt void
+WatchDog_Timer (void)
 {
     // Signal Main Thread to Calculate Next Speed Value
     G_ACCEL_FLAG = true;
     // Wake Up the Main Thread
-    __bic_SR_register_on_exit(LPM0_bits);
+    __bic_SR_register_on_exit (LPM0_bits);
 }

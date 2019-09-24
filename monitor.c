@@ -33,64 +33,71 @@
 /*******************************************************************************
  *
  *  monitor.c - c file for serial command monitor. Interprets and sends
- *  	      - data to/from the host PC
+ *            - data to/from the host PC
  *
  ******************************************************************************/
 
 #include "uart.h"
 #include "monitor.h"
 
-#define     RW_CMD          0x80
+#define RW_CMD          0x80
 
-#define     EXTENSION_BYTE      0x07
+#define EXTENSION_BYTE  0x07
 
-//RW CMD TYPE
-#define READ 1
-#define WRITE 0
-//ENDIANNESS
-#define BIG_ENDIAN 1
-#define LITTLE_ENDIAN 0
-//ADDRESSIBLE SIZE
-#define ADDRESSIBLE_32_BIT 1
-#define ADDRESSIBLE_16_BIT 0
-// override these depends on target: CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
-#define CMD_BUFFER_SIZE 68 //1 + 4 + 63 = 68
+// RW CMD TYPE
+#define READ                1
+#define WRITE               0
+// ENDIANNESS
+#define BIG_ENDIAN          1
+#define LITTLE_ENDIAN       0
+// ADDRESSIBLE SIZE
+#define ADDRESSIBLE_32_BIT  1
+#define ADDRESSIBLE_16_BIT  0
+// Override these depends on target: CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
+#define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
 
 unsigned char gInCmdBuffer[CMD_BUFFER_SIZE];
 unsigned short gInCmdBufferIdx = 0;
 volatile unsigned short gInCmdSkipCount;
 
-void ClearBufferRelatedParam();
+void
+ClearBufferRelatedParam ();
 
-// override these depends on target
-int GetTargetEndianness()
+// Override these depends on target
+int
+GetTargetEndianness ()
 {
     return LITTLE_ENDIAN;
 }
-// override these depends on target
-void Write8bitByteToCOM(unsigned char c)
+// Override these depends on target
+void
+Write8bitByteToCOM (unsigned char c)
 {
-    uartTxByte(c & 0xff);
+    uartTxByte (c & 0xff);
 }
 
-int GetSizeOfMAUIn8bitByte()
+int
+GetSizeOfMAUIn8bitByte ()
 {
     unsigned char maxMAUValue = (unsigned char)(-1);
-    switch (maxMAUValue)
-    {
+    switch (maxMAUValue) {
     case 0xff:
         return 1;
+
     case 0xffff:
         return 2;
+
     default:
         return 0;
     }
 }
 
-int WriteToCmdBuffer(unsigned char* buf, unsigned short* bufIdx, unsigned char d)
+int
+WriteToCmdBuffer (unsigned char  *buf,
+                  unsigned short *bufIdx,
+                  unsigned char   d)
 {
-    if ( (*bufIdx) < CMD_BUFFER_SIZE )
-    {
+    if ((*bufIdx) < CMD_BUFFER_SIZE) {
         buf[*bufIdx] = d & 0xff;
         (*bufIdx)++;
         return 0;
@@ -99,46 +106,52 @@ int WriteToCmdBuffer(unsigned char* buf, unsigned short* bufIdx, unsigned char d
     return 1;
 }
 
-void ResetInCmdBuffer()
+void
+ResetInCmdBuffer ()
 {
     gInCmdBufferIdx = 0;
 }
 
-int WriteByteToInCmdBuffer(unsigned char d)
+int
+WriteByteToInCmdBuffer (unsigned char d)
 {
-    return WriteToCmdBuffer(gInCmdBuffer, &gInCmdBufferIdx, d);
+    return WriteToCmdBuffer (gInCmdBuffer, &gInCmdBufferIdx, d);
 }
 
-int GetTransferSizeInMAU() //transfer size refer to the words to read/write of a given cmd, not the number of bytes for the whole cmd packet
+int
+GetTransferSizeInMAU () //transfer size refer to the words to read/write of a given cmd, not the number of bytes for the whole cmd packet
 {
     return (gInCmdBuffer[0] & 0x3f);
 }
 
-int VerifyInputCmdHeaders()
+int
+VerifyInputCmdHeaders ()
 {
     return ((gInCmdBuffer[0] & 0x80) == 0x80) ? 0 : 1;
 }
 
-int GetInputCmdType()
+int
+GetInputCmdType ()
 {
     return (gInCmdBuffer[0] & 0x80);
 }
 
-int GetRWFlag()//equivalent to endianness on the MAU in transmission
+int
+GetRWFlag ()//equivalent to endianness on the MAU in transmission
 {
     int ret = ((gInCmdBuffer[0] >> 6) & 0x1); //
     return ret;
 }
 
-unsigned char* GetInCmdAddress()
+unsigned char
+*GetInCmdAddress ()
 {
-    unsigned char* addr = 0;
+    unsigned char *addr = 0;
     unsigned long addr_value = 0;
     int i = 0;
     int addressSize = 4; // always use 32bit address
-    for (; i < addressSize; i++)
-    {
-        addr_value |= (unsigned long)( gInCmdBuffer[1 + i] << 8 * (addressSize - 1 - i) ); //big endian
+    for (; i < addressSize; i++) {
+        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 * (addressSize - 1 - i)); //big endian
     }
 
     addr = (unsigned char*) addr_value;
