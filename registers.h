@@ -42,7 +42,7 @@
 #ifndef REGISTERS_H_
 #define REGISTERS_H_
 
-// CTRL Register
+// CTRL register
 struct CTRL_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -55,7 +55,7 @@ struct CTRL_Register
     unsigned int ENBL;      // Bit 0
 };
 
-// TORQUE Register
+// TORQUE register
 struct TORQUE_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -64,7 +64,7 @@ struct TORQUE_Register
     unsigned int TORQUE;    // Bits 7-0
 };
 
-// OFF Register
+// OFF register
 struct OFF_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -73,7 +73,7 @@ struct OFF_Register
     unsigned int TOFF;      // Bits 7-0
 };
 
-// BLANK Register
+// BLANK register
 struct BLANK_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -82,7 +82,7 @@ struct BLANK_Register
     unsigned int TBLANK;    // Bits 7-0
 };
 
-// DECAY Register
+// DECAY register
 struct DECAY_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -91,7 +91,7 @@ struct DECAY_Register
     unsigned int TDECAY;    // Bits 7-0
 };
 
-// STALL Register
+// STALL register
 struct STALL_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -100,7 +100,7 @@ struct STALL_Register
     unsigned int SDTHR;     // Bits 7-0
 };
 
-// DRIVE Register
+// DRIVE register
 struct DRIVE_Register
 {
     unsigned int Address;   // Bits 14-12
@@ -112,7 +112,7 @@ struct DRIVE_Register
     unsigned int OCPTH;     // Bits 1-0
 };
 
-// STATUS Register
+// STATUS register
 struct STATUS_Register
 {
     unsigned int Address;   // Bits 14-12

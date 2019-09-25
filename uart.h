@@ -44,7 +44,7 @@
 #define UART_TXD        0x02                    // TXD on P1.1 (Timer0_A.OUT0)
 #define UART_RXD        0x04                    // RXD on P1.2 (Timer0_A.CCI1A)
 
-#define HARDWARE_UART   1                       /* Specify if Hardware UART is used */
+#define HARDWARE_UART   1                       /* Specify if hardware UART is used */
 
 //------------------------------------------------------------------------------
 // Conditions for 9600 Baud SW UART, SMCLK = 1MHz

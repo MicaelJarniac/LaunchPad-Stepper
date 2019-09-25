@@ -39,17 +39,17 @@
  *
  ******************************************************************************/
 
-/* 				Program Structure
+/*              Program Structure
  *
- *					 main.c
- *					  ^^^^
- *			   utility.h->utility.c		(Global Variables, Work Functions, SPI)
- *				^^^^		^^^^
- *			   	^^^^	registers.h		(DRV8711 Register Definitions)
- *			    ^^^^
- *			   monitor.h->monitor.c		(Serial Monitor for Host PC Connection)
- *					  ^^^^
- *			      uart.h->uart.c		(MSP430 Hardware/Software UART)
+ *                   main.c
+ *                    ^^^^
+ *             utility.h->utility.c     (Global variables, work functions, SPI)
+ *              ^^^^        ^^^^
+ *              ^^^^    registers.h     (DRV8711 register definitions)
+ *              ^^^^
+ *             monitor.h->monitor.c     (Serial monitor for host PC connection)
+ *                    ^^^^
+ *                uart.h->uart.c        (MSP430 hardware/software UART)
  *
  */
 
@@ -63,7 +63,7 @@ main (void)
     Initialize ();
 
     while (1) {
-        // Update Functions
+        // Update functions
         UpdateGPIO ();
         UpdateDRV8711Registers ();
         UpdateFullScaleCurrent ();
@@ -73,7 +73,7 @@ main (void)
     }
 }
 
-/****************************Interrupt Service Routines*****************************/
+/************************* Interrupt Service Routines *************************/
 
 #pragma vector=PORT1_VECTOR, PORT2_VECTOR, ADC10_VECTOR, \
         USCIAB0TX_VECTOR, TIMER0_A0_VECTOR, TIMER0_A1_VECTOR, \
@@ -87,7 +87,7 @@ Trap_ISR (void)
 __interrupt void
 Timer1_A0 (void)
 {
-    // Update Timer at End of PWM Period
+    // Update timer at end of PWM period
     if (G_LOAD_CCR_VALS == true) {
         G_CUR_SPEED = G_CUR_SPEED_TEMP;
         TA1CCR0 = G_TA1CCR0_TEMP;
@@ -102,15 +102,13 @@ Timer1_A1 (void)
 {
     switch (TA1IV) {
     case TA1IV_NONE:
-        break;                      // Vector 0: No Interrupt
+        break;                      // Vector 0: No interrupt
 
     case TA1IV_TACCR1:              // Vector 2: CCR1 CCIFG
-        // Increment Step Counter
+        // Increment step counter
         G_CUR_NUM_STEPS++;
         if (G_CUR_NUM_STEPS == G_TOTAL_NUM_STEPS)
-        {
             __bic_SR_register_on_exit (LPM0_bits);
-        }
         TA1CCTL1 &= ~CCIFG;
         break;
 
@@ -137,8 +135,8 @@ Timer1_A1 (void)
 __interrupt void
 WatchDog_Timer (void)
 {
-    // Signal Main Thread to Calculate Next Speed Value
+    // Signal main thread to calculate next speed value
     G_ACCEL_FLAG = true;
-    // Wake Up the Main Thread
+    // Wake up the main thread
     __bic_SR_register_on_exit (LPM0_bits);
 }

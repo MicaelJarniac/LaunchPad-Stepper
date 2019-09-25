@@ -33,7 +33,7 @@
 /*******************************************************************************
  *
  *  monitor.h - Definition file for serial command monitor. Interprets and sends
- *  	   - data to/from the host PC
+ *            - data to/from the host PC
  *
  ******************************************************************************/
 

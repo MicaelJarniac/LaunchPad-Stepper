@@ -42,17 +42,17 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
 
- /*****************************************************************************/
+/******************************************************************************/
 
-// MSP430 Clk Frequencies
-#define MCLK_MHz    16      // Main Clock Frequency
-#define SMCLK_MHz   2       // Sub Main Clock Frequency
+// MSP430 clk frequencies
+#define MCLK_MHz    16      // Main clock frequency
+#define SMCLK_MHz   2       // Sub main clock frequency
 
-// GPIO Port 1 Definitions
+// GPIO port 1 definitions
 #define POT         BIT0    // P1.0
 #define nSLEEP      BIT4    // P1.4
 
-// GPIO Port 2 Definitions
+// GPIO port 2 definitions
 #define RESET       BIT0    // P2.0
 #define STEP_AIN1   BIT1    // P2.1
 #define DIR_AIN2    BIT2    // P2.2
@@ -61,23 +61,23 @@
 #define nSTALL      BIT6    // P2.6
 #define nFAULT      BIT7    // P2.7
 
-// SPI Port Definitions
+// SPI port definitions
 #define CS          BIT3    // P2.3
 #define SCLK        BIT5    // SCLK
 #define SDATO       BIT6    // MISO
 #define SDATI       BIT7    // MOSI
 
-// Register Access
+// Register access
 #define REGWRITE    0x00
 #define REGREAD     0x80
 
-// Default Defines
+// Default defines
 #define	DEFAULT_START_STOP_SPEED    128         // Initial speed of the motor (PPS)
 #define DEFAULT_TARGET_SPEED        512         // Target speed of the motor (PPS)
 #define DEFAULT_ACCEL_RATE          128         // Acceleration/deceleration rate (PPSPS)
 #define DEFAULT_NUM_STEPS           1024        // Number of steps
 
-// Custom Types
+// Custom types
 typedef enum
 {
     false,
@@ -105,28 +105,28 @@ typedef enum
     HOLD
 } MotorState;
 
-/*****************************************************************************/
+/******************************************************************************/
 
-// Declare Global Variables
+// Declare global variables
 
-// GUI Variables
+// GUI variables
 extern float G_FIRMWARE_VERSION;          // Version number of the firmware
 extern float G_FULL_SCALE_CURRENT;        // Full scale chopping current
 extern int G_TORQUE_OLD;                  // Previous TORQUE value
 extern int G_ISGAIN_OLD;                  // Previous GAIN value
 extern boolean G_BYPASS_INDEXER;          // GUI widget to disable indexer mode
 extern boolean G_BYPASS_INDEXER_OLD;      // Previous value for edge detection
-extern boolean G_WRITE_ALL_REG;           // Write All Registers
-extern boolean G_READ_ALL_REG;            // Read All Registers
-extern boolean G_RESET_FAULTS;            // Reset All Faults
+extern boolean G_WRITE_ALL_REG;           // Write all registers
+extern boolean G_READ_ALL_REG;            // Read all registers
+extern boolean G_RESET_FAULTS;            // Reset all faults
 extern boolean G_MANUAL_WRITE;            // Manually write SPI data
-extern unsigned int G_WRITE_ADDR;         // SPI Address
-extern unsigned int G_WRITE_DATA;         // SPI Data
+extern unsigned int G_WRITE_ADDR;         // SPI address
+extern unsigned int G_WRITE_DATA;         // SPI data
 extern boolean G_MANUAL_READ;             // Manually read SPI data
-extern unsigned int G_READ_ADDR;          // SPI Address
-extern unsigned int G_READ_DATA;          // SPI Data
+extern unsigned int G_READ_ADDR;          // SPI address
+extern unsigned int G_READ_DATA;          // SPI data
 
-// Stepper Motion Profile
+// Stepper motion profile
 extern unsigned int G_START_STOP_SPEED;   // Initial and final speed of the motor (PPS)
 extern unsigned int G_TARGET_SPEED;       // Target speed of the motor (PPS)
 extern unsigned int G_ACCEL_RATE;         // Acceleration/deceleration rate (PPSPS)
@@ -138,21 +138,21 @@ extern boolean G_SPEED_PROFILE_LOCK;      // Lock the speed profile
 extern boolean G_STEP_PROFILE;            // Start/stop a specific number of steps
 extern boolean G_STEP_PROFILE_LOCK;       // Lock the step profile
 
-// Motor Status
+// Motor status
 extern unsigned int G_CUR_NUM_STEPS;      // Number of steps the motor has advanced
 extern unsigned int G_CUR_SPEED;          // Current speed of the motor
-extern unsigned int G_CUR_SPEED_TEMP;     // Next speed after Accel/Decel update
-extern unsigned int G_SPEED_INCR;         // Amount to increment/decrement speed each Accel/Decel update
+extern unsigned int G_CUR_SPEED_TEMP;     // Next speed after accel/decel update
+extern unsigned int G_SPEED_INCR;         // Amount to increment/decrement speed each accel/decel update
 extern boolean G_ACCEL_FLAG;              // Signals to calculate next speed value
 
-// Holding Values For Timer A1 CCR Registers
+// Holding values for timer A1 CCR registers
 extern unsigned int G_TA1CCR0_TEMP;
 extern unsigned int G_TA1CCR1_TEMP;
-extern boolean G_LOAD_CCR_VALS;           // Flag to load the temporary CCR Register values
+extern boolean G_LOAD_CCR_VALS;           // Flag to load the temporary CCR register values
 
 // DRV8711 GPIO
 extern gpio G_nSLEEP;                     // Logic low to enter low power sleep mode
-extern gpio G_RESET;                      // Logic high to reset internal logic and disable h-bridge
+extern gpio G_RESET;                      // Logic high to reset internal logic and disable H-bridge
 extern gpio G_STEP_AIN1;                  // Rising edge advances indexer one step (controls AOUT1)
 extern gpio G_DIR_AIN2;                   // Sets direction of stepping (controls AOUT2)
 extern gpio G_BIN2;                       // Controls BOUT1
@@ -160,7 +160,7 @@ extern gpio G_BIN1;                       // Controls BOUT2
 extern gpio G_nFAULT;                     // Logic low when in FAULT condition
 extern gpio G_nSTALL;                     // Logic low when in STALL condition
 
-// DRV8711 Registers
+// DRV8711 registers
 extern struct CTRL_Register     G_CTRL_REG;
 extern struct TORQUE_Register   G_TORQUE_REG;
 extern struct OFF_Register      G_OFF_REG;
@@ -170,9 +170,9 @@ extern struct STALL_Register    G_STALL_REG;
 extern struct DRIVE_Register    G_DRIVE_REG;
 extern struct STATUS_Register   G_STATUS_REG;
 
-/*****************************************************************************/
+/******************************************************************************/
 
-// Function Declarations
+// Function declarations
 void            Initialize ();
 void            UpdateGPIO ();
 void            UpdateDRV8711Registers ();

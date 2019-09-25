@@ -45,11 +45,11 @@
 #include "uart.h"
 #include "registers.h"
 
- /*****************************************************************************/
+/******************************************************************************/
 
-// Define Global Variables
+// Define global variables
 
-// GUI Variables
+// GUI variables
 float           G_FIRMWARE_VERSION      = 1.0;
 float           G_FULL_SCALE_CURRENT    = 1.0;
 int             G_TORQUE_OLD            = 0;
@@ -66,7 +66,7 @@ boolean         G_MANUAL_READ           = false;
 unsigned int    G_READ_ADDR             = 0;
 unsigned int    G_READ_DATA             = 0;
 
-// Stepper Motion Profile
+// Stepper motion profile
 unsigned int    G_START_STOP_SPEED      = 0;
 unsigned int    G_TARGET_SPEED          = 0;
 unsigned int    G_ACCEL_RATE            = 0;
@@ -78,29 +78,29 @@ boolean         G_SPEED_PROFILE_LOCK    = false;
 boolean         G_STEP_PROFILE          = false;
 boolean         G_STEP_PROFILE_LOCK     = false;
 
-// Motor Status
+// Motor status
 unsigned int    G_CUR_NUM_STEPS         = 0;
 unsigned int    G_CUR_SPEED             = 0;
 unsigned int    G_CUR_SPEED_TEMP        = 0;
 unsigned int    G_SPEED_INCR            = 0;
 boolean         G_ACCEL_FLAG            = false;
 
-// Holding Values For Timer A1 CCR Registers
+// Holding values for timer A1 CCR registers
 unsigned int    G_TA1CCR0_TEMP          = 0;
 unsigned int    G_TA1CCR1_TEMP          = 0;
 boolean         G_LOAD_CCR_VALS         = false;
 
 // DRV8711 GPIO
-gpio G_nSLEEP       = low;
-gpio G_RESET        = low;
-gpio G_STEP_AIN1    = low;
-gpio G_DIR_AIN2     = low;
-gpio G_BIN2         = low;
-gpio G_BIN1         = low;
-gpio G_nFAULT       = low;
-gpio G_nSTALL       = low;
+gpio G_nSLEEP           = low;
+gpio G_RESET            = low;
+gpio G_STEP_AIN1        = low;
+gpio G_DIR_AIN2         = low;
+gpio G_BIN2             = low;
+gpio G_BIN1             = low;
+gpio G_nFAULT           = low;
+gpio G_nSTALL           = low;
 
-// DRV8711 Registers
+// DRV8711 registers
 struct CTRL_Register    G_CTRL_REG;
 struct TORQUE_Register  G_TORQUE_REG;
 struct OFF_Register     G_OFF_REG;
@@ -110,45 +110,45 @@ struct STALL_Register   G_STALL_REG;
 struct DRIVE_Register   G_DRIVE_REG;
 struct STATUS_Register  G_STATUS_REG;
 
-/*****************************************************************************/
+/******************************************************************************/
 
-// Function Definitions
+// Function definitions
 void
 Initialize ()
 {
     // Setup CLKs
 
-    // Stop Watchdog Timer
-    WDTCTL = WDTPW | WDTHOLD;
+    // Stop watchdog timer
+    WDTCTL   = WDTPW | WDTHOLD;
     // Set DCO to 16MHz
-    DCOCTL = 0x00;
-    DCOCTL = CALDCO_16MHZ;
-    BCSCTL1 = CALBC1_16MHZ;
+    DCOCTL   = 0x00;
+    DCOCTL   = CALDCO_16MHZ;
+    BCSCTL1  = CALBC1_16MHZ;
     // Set SMCLK to 2MHz
     BCSCTL2 |= DIVS_3;
     // ACLK = VLO
     BCSCTL3 |= LFXT1S_2;
 
-    // Configure Port Directions and Peripherals as Needed
+    // Configure port directions and peripherals as needed
 
     // Configure GPIO
     P1SEL  &= ~(POT | nSLEEP);
     P1SEL2 &= ~(POT | nSLEEP);
 
-    P1DIR  |= (POT | nSLEEP);
-    P1OUT  |= (POT | nSLEEP);
+    P1DIR  |=  (POT | nSLEEP);
+    P1OUT  |=  (POT | nSLEEP);
 
     P2SEL  &= ~(RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1 | nFAULT | nSTALL);
     P2SEL2 &= ~(RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1 | nFAULT | nSTALL);
 
-    P2DIR |= (RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
-    P2OUT &= ~(RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
+    P2DIR  |=  (RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
+    P2OUT  &= ~(RESET | STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
 
-    P2DIR &= ~(nFAULT | nSTALL);
-    P2REN |= (nFAULT | nSTALL);
+    P2DIR  &= ~(nFAULT | nSTALL);
+    P2REN  |=  (nFAULT | nSTALL);
 
-    P3DIR |= (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
-    P3OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3DIR  |=  (BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
+    P3OUT  &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7);
 
     // Configure SPI
     // Recommended USCI initialization/re-configure process
@@ -162,10 +162,10 @@ Initialize ()
     UCB0CTL1 = UCSWRST;
 
     // 2)
-    P2DIR |= CS;
-    P2OUT &= ~CS;
-    P1SEL |= SCLK | SDATO |  SDATI;
-    P1SEL2 |= SCLK | SDATO |  SDATI;
+    P2DIR  |=  CS;
+    P2OUT  &= ~CS;
+    P1SEL  |=  SCLK | SDATO | SDATI;
+    P1SEL2 |=  SCLK | SDATO | SDATI;
 
     // 3) 3-pin, 8-bit SPI master
     UCB0CTL0 |= UCCKPH | UCMSB | UCMST | UCSYNC;
@@ -173,18 +173,18 @@ Initialize ()
 
     // 4)
     UCB0CTL1 &= ~UCSWRST;
-    // End SPI Configure
+    // End SPI configure
 
-    // UART Initialization
+    // UART initialization
     uartInit ();
 
-    // Enables LPM Interrupts
+    // Enables LPM interrupts
     __bis_SR_register (GIE);
 
-    // GUI Composer Monitor Initialization
+    // GUI composer monitor initialization
     ClearBufferRelatedParam ();
 
-    // Set Default GPIO Settings
+    // Set default GPIO settings
     G_nSLEEP    = low;
     G_RESET     = low;
     G_STEP_AIN1 = low;
@@ -195,19 +195,19 @@ Initialize ()
     G_nSTALL    = high;
     UpdateGPIO ();
 
-    // Setup Pin for Timer Output
-    P2DIR |= STEP_AIN1;
-    P2SEL |= STEP_AIN1;
+    // Setup pin for timer output
+    P2DIR  |=  STEP_AIN1;
+    P2SEL  |=  STEP_AIN1;
     P2SEL2 &= ~STEP_AIN1;
 
-    // Load Default Speed Profile Values
+    // Load default speed profile values
     G_START_STOP_SPEED      = DEFAULT_START_STOP_SPEED;
     G_TARGET_SPEED          = DEFAULT_TARGET_SPEED;
     G_ACCEL_RATE            = DEFAULT_ACCEL_RATE;
     G_TOTAL_NUM_STEPS       = DEFAULT_NUM_STEPS;
 
-    // Set Default Register Settings
-    // CTRL Register
+    // Set default register settings
+    // CTRL register
     G_CTRL_REG.Address      = 0x00;
     G_CTRL_REG.DTIME        = 0x03;
     G_CTRL_REG.ISGAIN       = 0x03;
@@ -217,33 +217,33 @@ Initialize ()
     G_CTRL_REG.RDIR         = 0x00;
     G_CTRL_REG.ENBL         = 0x01;
 
-    // TORQUE Register
+    // TORQUE register
     G_TORQUE_REG.Address    = 0x01;
     G_TORQUE_REG.SIMPLTH    = 0x00;
     G_TORQUE_REG.TORQUE     = 0xBA;
 
-    // OFF Register
+    // OFF register
     G_OFF_REG.Address       = 0x02;
     G_OFF_REG.PWMMODE       = 0x00;
     G_OFF_REG.TOFF          = 0x30;
 
-    // BLANK Register
+    // BLANK register
     G_BLANK_REG.Address     = 0x03;
     G_BLANK_REG.ABT         = 0x01;
     G_BLANK_REG.TBLANK      = 0x08;
 
-    // DECAY Register.
+    // DECAY register.
     G_DECAY_REG.Address     = 0x04;
     G_DECAY_REG.DECMOD      = 0x03;
     G_DECAY_REG.TDECAY      = 0x10;
 
-    // STALL Register
+    // STALL register
     G_STALL_REG.Address     = 0x05;
     G_STALL_REG.VDIV        = 0x03;
     G_STALL_REG.SDCNT       = 0x03;
     G_STALL_REG.SDTHR       = 0x40;
 
-    // DRIVE Register
+    // DRIVE register
     G_DRIVE_REG.Address     = 0x06;
     G_DRIVE_REG.IDRIVEP     = 0x00;
     G_DRIVE_REG.IDRIVEN     = 0x00;
@@ -252,7 +252,7 @@ Initialize ()
     G_DRIVE_REG.OCPDEG      = 0x01;
     G_DRIVE_REG.OCPTH       = 0x01;
 
-    // STATUS Register
+    // STATUS register
     G_STATUS_REG.Address    = 0x07;
     G_STATUS_REG.STDLAT     = 0x00;
     G_STATUS_REG.STD        = 0x00;
@@ -268,48 +268,48 @@ Initialize ()
 void
 UpdateGPIO ()
 {
-    // Update the GPIO Pins from Global Variables
+    // Update the GPIO pins from global variables
     // nSLEEP
     if (G_nSLEEP == high)
-        P1OUT |= nSLEEP;
+        P1OUT |=  nSLEEP;
     else
         P1OUT &= ~nSLEEP;
 
     // RESET
     if (G_RESET == high)
-        P2OUT |= RESET;
+        P2OUT |=  RESET;
     else
         P2OUT &= ~RESET;
 
-    // DC Motor Mode
+    // DC motor mode
     if (G_BYPASS_INDEXER == true) {
-        // Change from Indexer to DC Motor Mode
+        // Change from indexer to DC motor mode
         if (G_BYPASS_INDEXER_OLD == false) {
-            // Stop Watchdog Interval Timer
-            WDTCTL = WDTPW | WDTHOLD;
-            IE1 &= ~WDTIE;
-            // Disable Timer
-            TA1CTL = TASSEL_2 | MC_0 | TACLR;
+            // Stop watchdog interval timer
+            WDTCTL =  WDTPW | WDTHOLD;
+            IE1   &= ~WDTIE;
+            // Disable timer
+            TA1CTL =  TASSEL_2 | MC_0 | TACLR;
             G_CUR_SPEED             = 0;
-            // Reset State Machine
+            // Reset state machine
             G_SPEED_PROFILE         = false;
             G_STEP_PROFILE          = false;
             G_SPEED_PROFILE_LOCK    = false;
             G_STEP_PROFILE_LOCK     = false;
             G_MOTOR_STATE           = HOLD;
 
-            // Configure Pins for IN/IN Control and Set All Outputs Low
+            // Configure pins for IN/IN control and set all outputs low
             P2SEL  &= ~(STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
             P2SEL2 &= ~(STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
-            P2OUT &= ~(STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
-            P2DIR |= (STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
+            P2OUT  &= ~(STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
+            P2DIR  |=  (STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
 
             G_STEP_AIN1 = low;
             G_DIR_AIN2  = low;
             G_BIN2      = low;
             G_BIN1      = low;
 
-            // Change DRV8711 Mode
+            // Change DRV8711 mode
             G_OFF_REG.PWMMODE = 1;
             WriteAllRegisters ();
 
@@ -318,39 +318,39 @@ UpdateGPIO ()
 
         // STEP_AIN1
         if (G_STEP_AIN1 == high)
-            P2OUT |= STEP_AIN1;
+            P2OUT |=  STEP_AIN1;
         else
             P2OUT &= ~STEP_AIN1;
 
         // DIR_AIN2
         if (G_DIR_AIN2 == high)
-            P2OUT |= DIR_AIN2;
+            P2OUT |=  DIR_AIN2;
         else
             P2OUT &= ~DIR_AIN2;
 
         // BIN1
         if (G_BIN1 == high)
-            P2OUT |= BIN1;
+            P2OUT |=  BIN1;
         else
             P2OUT &= ~BIN1;
 
         // BIN2
         if (G_BIN2 == high)
-            P2OUT |= BIN2;
+            P2OUT |=  BIN2;
         else
             P2OUT &= ~BIN2;
     } else {
-        // Stepper Motor Mode
-        // Change from DC Motor to Indexer Mode
+        // Stepper motor mode
+        // Change from DC motor to indexer mode
         if (G_BYPASS_INDEXER_OLD == true) {
-            // Reset State Machine
+            // Reset state machine
             G_SPEED_PROFILE         = false;
             G_STEP_PROFILE          = false;
             G_SPEED_PROFILE_LOCK    = false;
             G_STEP_PROFILE_LOCK     = false;
             G_MOTOR_STATE           = HOLD;
 
-            // Set All Outputs Low
+            // Set all outputs low
             P2OUT &= ~(STEP_AIN1 | DIR_AIN2 | BIN2 | BIN1);
 
             G_STEP_AIN1 = low;
@@ -358,44 +358,45 @@ UpdateGPIO ()
             G_BIN2      = low;
             G_BIN1      = low;
 
-            // Setup Pin for Timer Output
-            P2DIR |= STEP_AIN1;
-            P2SEL |= STEP_AIN1;
+            // Setup pin for timer output
+            P2DIR  |=  STEP_AIN1;
+            P2SEL  |=  STEP_AIN1;
             P2SEL2 &= ~STEP_AIN1;
 
-            // Change DRV8711 Mode
+            // Change DRV8711 mode
             G_OFF_REG.PWMMODE = 0;
             WriteAllRegisters ();
 
             G_BYPASS_INDEXER_OLD = false;
         }
 
-        // STEP_AIN1 (Send 1 Step)
+        // STEP_AIN1 (send 1 step)
         if (G_STEP_AIN1 == high) {
-            // Set the Timer Output Low
-            TA1CCTL1 = OUTMOD_0;
-            P2OUT &= ~STEP_AIN1;
-            // Configure Pin for GPIO
-            P2SEL  &= ~STEP_AIN1;
-            P2SEL2 &= ~STEP_AIN1;
-            P2DIR |= STEP_AIN1;
-            P2OUT &= ~STEP_AIN1;
-            // Send 1 Pulse
-            P2OUT |= STEP_AIN1;
+            // Set the timer output low
+            TA1CCTL1 =  OUTMOD_0;
+            P2OUT   &= ~STEP_AIN1;
+            // Configure pin for GPIO
+            P2SEL   &= ~STEP_AIN1;
+            P2SEL2  &= ~STEP_AIN1;
+            P2DIR   |=  STEP_AIN1;
+            P2OUT   &= ~STEP_AIN1;
+            // Send 1 pulse
+            P2OUT   |=  STEP_AIN1;
             int i = 0;
-            for (i = 0; i < 1000; i++) { __delay_cycles (1000); }
-            P2OUT &= ~STEP_AIN1;
-            // Setup Pin for Timer Output
-            P2DIR |= STEP_AIN1;
-            P2SEL |= STEP_AIN1;
-            P2SEL2 &= ~STEP_AIN1;
+            for (i = 0; i < 1000; i++)
+                __delay_cycles (1000);
+            P2OUT   &= ~STEP_AIN1;
+            // Setup pin for timer output
+            P2DIR   |=  STEP_AIN1;
+            P2SEL   |=  STEP_AIN1;
+            P2SEL2  &= ~STEP_AIN1;
             // Reset STEP_AIN1
             G_STEP_AIN1 = low;
         }
 
         // DIR_AIN2
         if (G_DIR_AIN2 == high)
-            P2OUT |= DIR_AIN2;
+            P2OUT |=  DIR_AIN2;
         else
             P2OUT &= ~DIR_AIN2;
     }
@@ -416,13 +417,13 @@ UpdateGPIO ()
 void
 UpdateDRV8711Registers ()
 {
-    // Write All Registers
+    // Write all registers
     if (G_WRITE_ALL_REG == true) {
         WriteAllRegisters ();
         G_WRITE_ALL_REG = false;
     }
 
-    // Read All Registers
+    // Read all registers
     if (G_READ_ALL_REG == true) {
         ReadAllRegisters ();
         G_READ_ALL_REG = false;
@@ -442,7 +443,7 @@ UpdateDRV8711Registers ()
         G_RESET_FAULTS      = false;
     }
 
-    // Manual SPI Write
+    // Manual SPI write
     if (G_MANUAL_WRITE == true) {
         unsigned char byteHi = REGWRITE | (G_WRITE_ADDR << 4) | (G_WRITE_DATA >> 8);
         unsigned char byteLo = G_WRITE_DATA;
@@ -450,7 +451,7 @@ UpdateDRV8711Registers ()
         G_MANUAL_WRITE = false;
     }
 
-    // Manual SPI Read
+    // Manual SPI read
     if (G_MANUAL_READ == true) {
         unsigned char byte = REGREAD | (G_READ_ADDR << 4);
         G_READ_DATA = SPI_DRV8711_ReadWrite (byte, 0x00) & 0x0FFF;
@@ -464,42 +465,42 @@ WriteAllRegisters ()
     unsigned char dataHi = 0x00;
     unsigned char dataLo = 0x00;
 
-    // Write CTRL Register
+    // Write CTRL register
     dataHi = REGWRITE | (G_CTRL_REG.Address << 4) | (G_CTRL_REG.DTIME << 2) | (G_CTRL_REG.ISGAIN);
     dataLo = (G_CTRL_REG.EXSTALL << 7) | (G_CTRL_REG.MODE << 3) | (G_CTRL_REG.RSTEP << 2) | (G_CTRL_REG.RDIR << 1) | (G_CTRL_REG.ENBL);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write TORQUE Register
+    // Write TORQUE register
     dataHi = REGWRITE | (G_TORQUE_REG.Address << 4) | (G_TORQUE_REG.SIMPLTH);
     dataLo = G_TORQUE_REG.TORQUE;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write OFF Register
+    // Write OFF register
     dataHi = REGWRITE | (G_OFF_REG.Address << 4) | (G_OFF_REG.PWMMODE);
     dataLo = G_OFF_REG.TOFF;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write BLANK Register
+    // Write BLANK register
     dataHi = REGWRITE | (G_BLANK_REG.Address << 4) | (G_BLANK_REG.ABT);
     dataLo = G_BLANK_REG.TBLANK;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write DECAY Register
+    // Write DECAY register
     dataHi = REGWRITE | (G_DECAY_REG.Address << 4) | (G_DECAY_REG.DECMOD);
     dataLo = G_DECAY_REG.TDECAY;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write STALL Register
+    // Write STALL register
     dataHi = REGWRITE | (G_STALL_REG.Address << 4) | (G_STALL_REG.VDIV << 2) | (G_STALL_REG.SDCNT);
     dataLo = G_STALL_REG.SDTHR;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write DRIVE Register
+    // Write DRIVE register
     dataHi = REGWRITE | (G_DRIVE_REG.Address << 4) | (G_DRIVE_REG.IDRIVEP << 2) | (G_DRIVE_REG.IDRIVEN);
     dataLo = (G_DRIVE_REG.TDRIVEP << 6) | (G_DRIVE_REG.TDRIVEN << 4) | (G_DRIVE_REG.OCPDEG << 2) | (G_DRIVE_REG.OCPTH);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
-    // Write STATUS Register
+    // Write STATUS register
     dataHi = REGWRITE | (G_STATUS_REG.Address << 4);
     dataLo = (G_STATUS_REG.STDLAT << 7) | (G_STATUS_REG.STD << 6) | (G_STATUS_REG.UVLO << 5) | (G_STATUS_REG.BPDF << 4) | (G_STATUS_REG.APDF << 3) | (G_STATUS_REG.BOCP << 2) | (G_STATUS_REG.AOCP << 1) | (G_STATUS_REG.OTS);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
@@ -512,7 +513,7 @@ ReadAllRegisters ()
     const unsigned char dataLo      = 0x00;
     unsigned int        readData    = 0x00;
 
-    // Read CTRL Register
+    // Read CTRL register
     dataHi      = REGREAD | (G_CTRL_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_CTRL_REG.DTIME        = ((readData >> 10) & 0x0003);
@@ -523,38 +524,38 @@ ReadAllRegisters ()
     G_CTRL_REG.RDIR         = ((readData >> 1) & 0x0001);
     G_CTRL_REG.ENBL         = ((readData >> 0) & 0x0001);
 
-    // Read TORQUE Register
+    // Read TORQUE register
     dataHi      = REGREAD | (G_TORQUE_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_TORQUE_REG.SIMPLTH    = ((readData >> 8) & 0x0007);
     G_TORQUE_REG.TORQUE     = ((readData >> 0) & 0x00FF);
 
-    // Read OFF Register
+    // Read OFF register
     dataHi      = REGREAD | (G_OFF_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_OFF_REG.PWMMODE       = ((readData >> 8) & 0x0001);
     G_OFF_REG.TOFF          = ((readData >> 0) & 0x00FF);
 
-    // Read BLANK Register
+    // Read BLANK register
     dataHi      = REGREAD | (G_BLANK_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_BLANK_REG.ABT         = ((readData >> 8) & 0x0001);
     G_BLANK_REG.TBLANK      = ((readData >> 0) & 0x00FF);
 
-    // Read DECAY Register
+    // Read DECAY register
     dataHi      = REGREAD | (G_DECAY_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_DECAY_REG.DECMOD      = ((readData >> 8) & 0x0007);
     G_DECAY_REG.TDECAY      = ((readData >> 0) & 0x00FF);
 
-    // Read STALL Register
+    // Read STALL register
     dataHi      = REGREAD | (G_STALL_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_STALL_REG.VDIV        = ((readData >> 10) & 0x0003);
     G_STALL_REG.SDCNT       = ((readData >> 8) & 0x0003);
     G_STALL_REG.SDTHR       = ((readData >> 0) & 0x00FF);
 
-    // Read DRIVE Register
+    // Read DRIVE register
     dataHi      = REGREAD | (G_DRIVE_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_DRIVE_REG.IDRIVEP     = ((readData >> 10) & 0x0003);
@@ -564,7 +565,7 @@ ReadAllRegisters ()
     G_DRIVE_REG.OCPDEG      = ((readData >> 2) & 0x0003);
     G_DRIVE_REG.OCPTH       = ((readData >> 0) & 0x0003);
 
-    // Read STATUS Register
+    // Read STATUS register
     dataHi      = REGREAD | (G_STATUS_REG.Address << 4);
     readData    = SPI_DRV8711_ReadWrite (dataHi, dataLo);
     G_STATUS_REG.STDLAT     = ((readData >> 7) & 0x0001);
@@ -580,7 +581,7 @@ ReadAllRegisters ()
 void
 UpdateFullScaleCurrent ()
 {
-    // Calculate the 100% Chopping Current Level
+    // Calculate the 100% chopping current level
     if ((G_CTRL_REG.ISGAIN != G_ISGAIN_OLD) || (G_TORQUE_REG.TORQUE != G_TORQUE_OLD)) {
         // Parse ISGAIN
         unsigned int temp_isgain;
@@ -595,7 +596,7 @@ UpdateFullScaleCurrent ()
         else
             temp_isgain = 5;
 
-        // Calculate Floating Point Value
+        // Calculate floating point value
         G_FULL_SCALE_CURRENT = (2.75 * (float)G_TORQUE_REG.TORQUE) / (256 * (float)temp_isgain * 0.05);
         G_ISGAIN_OLD = G_CTRL_REG.ISGAIN;
         G_TORQUE_OLD = G_TORQUE_REG.TORQUE;
@@ -606,59 +607,59 @@ void
 UpdateStepperMotionProfile ()
 {
     if (G_BYPASS_INDEXER == false) {
-        // Motion Profile State Machine
-        // Speed Profile Motor Start
+        // Motion profile state machine
+        // Speed profile motor start
         if ((G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == false)) {
             G_MOTOR_STATE = SPD_START;
         }
-        // Speed Profile Motor Accelerating
+        // Speed profile motor accelerating
         else if ((G_CUR_SPEED < G_TARGET_SPEED) && (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_ACCEL;
         }
-        // Speed Profile Motor Stable
+        // Speed profile motor stable
         else if ((G_CUR_SPEED == G_TARGET_SPEED) && (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_STABLE;
         }
-        // Speed Profile Motor Decelerating
+        // Speed profile motor decelerating
         else if ((G_CUR_SPEED > G_START_STOP_SPEED) && (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_DECEL;
         }
-        // Speed Profile Motor Stop
+        // Speed profile motor stop
         else if ((G_CUR_SPEED == G_START_STOP_SPEED) && (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_STOP;
         }
-        // Step Profile Motor Start
+        // Step profile motor start
         else if ((G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == false)) {
             G_MOTOR_STATE = STP_START;
         }
-        // Step Profile Motor Accelerating
+        // Step profile motor accelerating
         else if ((G_CUR_NUM_STEPS < G_STEPS_TO_ACCEL) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_ACCEL;
         }
-        // Step Profile Motor Stable
+        // Step profile motor stable
         else if ((G_CUR_NUM_STEPS < (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_STABLE;
         }
-        // Step Profile Motor Decelerating
+        // Step profile motor decelerating
         else if ((G_CUR_NUM_STEPS >= (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) && (G_CUR_NUM_STEPS < G_TOTAL_NUM_STEPS) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_DECEL;
         }
-        // Step Profile Motor Stop
+        // Step profile motor stop
         else if ((G_CUR_NUM_STEPS >= G_TOTAL_NUM_STEPS) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_STOP;
         }
-        // Step Profile Force Motor Stop
+        // Step profile force motor stop
         else if ((G_STEP_PROFILE == false) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_STOP;
         }
-        // Motor Hold
+        // Motor hold
         else {
             G_MOTOR_STATE = HOLD;
         }
 
-        // Speed Profile
+        // Speed profile
         SpeedProfile ();
-        // Step Profile
+        // Step profile
         StepProfile ();
     }
 }
@@ -666,52 +667,52 @@ UpdateStepperMotionProfile ()
 void
 SpeedProfile ()
 {
-    // Motor Start
+    // Motor start
     if (G_MOTOR_STATE == SPD_START) {
         G_SPEED_PROFILE_LOCK = true;
-        // Set the Start Speed (Cannot Overflow the Timer Register)
+        // Set the start speed (cannot overflow the timer register)
         G_CUR_NUM_STEPS = 0;
-        // Value Check
+        // Value check
         if (G_START_STOP_SPEED > G_TARGET_SPEED)
             G_START_STOP_SPEED = G_TARGET_SPEED;
         G_CUR_SPEED = G_START_STOP_SPEED;
         TA1CCR0 = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
-        // Determine the Acceleration Increment
-        // Watchdog Timer Fires Every 16.384ms, ~61.035 Interupts/s (Accel Rate Cannot be Less Than 64)
-        // Round Accelerat Rate to Increment of 64
+        // Determine the acceleration increment
+        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate cannot be less than 64)
+        // Round accelerat rate to increment of 64
         G_ACCEL_RATE = (G_ACCEL_RATE >> 6) << 6;
         G_SPEED_INCR = G_ACCEL_RATE >> 6;
 
-        // Set the Timer Output Low
-        TA1CCTL1 = OUTMOD_0;
-        P2OUT &= ~STEP_AIN1;
-        // Setup the Output and Interrupt
-        TA1CCTL0 = CCIE;
-        TA1CCTL1 = OUTMOD_3 | CCIE;
-        // Start the Timer
-        TA1CTL = TASSEL_2 | MC_1 | TACLR;
+        // Set the timer output low
+        TA1CCTL1 =  OUTMOD_0;
+        P2OUT   &= ~STEP_AIN1;
+        // Setup the output and interrupt
+        TA1CCTL0 =  CCIE;
+        TA1CCTL1 =  OUTMOD_3 | CCIE;
+        // Start the timer
+        TA1CTL   =  TASSEL_2 | MC_1 | TACLR;
 
-        // Setup Watchdog Timer as an Interval Timer for Accel/Decel Updates
-        WDTCTL = WDT_MDLY_32;
-        IE1 |= WDTIE;
+        // Setup watchdog timer as an interval timer for accel/decel updates
+        WDTCTL   =  WDT_MDLY_32;
+        IE1     |=  WDTIE;
     }
 
-    // Motor Accelerate
+    // Motor accelerate
     else if ((G_MOTOR_STATE == SPD_ACCEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
-        // Increase Speed
+        // Increase speed
         if ((G_CUR_SPEED + G_SPEED_INCR) < G_TARGET_SPEED) {
-            // Calcute Next Speed Value (Cannot Overflow the Timer Register)
+            // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED + G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-        // Load Target Speed
+        // Load target speed
         else {
-            // Calcute Target Speed Value (Cannot Overflow the Timer Register)
+            // Calcute target speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_TARGET_SPEED;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_TARGET_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_TARGET_SPEED) >> 1;
@@ -719,20 +720,20 @@ SpeedProfile ()
         }
     }
 
-    // Motor Decelerate
+    // Motor decelerate
     else if ((G_MOTOR_STATE == SPD_DECEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
-        // Decrease Speed
+        // Decrease speed
         if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) && (G_CUR_SPEED > G_SPEED_INCR)) {
-            // Calcute Next Speed Value (Cannot Overflow the Timer Register)
+            // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-        // Load Stop Speed
+        // Load stop speed
         else {
-            // Calcute Stop Speed Value (Cannot Overflow the Timer Register)
+            // Calcute stop speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_START_STOP_SPEED;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
@@ -740,77 +741,77 @@ SpeedProfile ()
         }
     }
 
-    // Motor Stop
+    // Motor stop
     else if (G_MOTOR_STATE == SPD_STOP) {
-        // Stop Watchdog Interval Timer
-        WDTCTL = WDTPW | WDTHOLD;
-        IE1 &= ~WDTIE;
-        // Disable Timer
-        TA1CTL = TASSEL_2 | MC_0 | TACLR;
+        // Stop watchdog interval timer
+        WDTCTL =  WDTPW | WDTHOLD;
+        IE1   &= ~WDTIE;
+        // Disable timer
+        TA1CTL =  TASSEL_2 | MC_0 | TACLR;
         G_CUR_SPEED = 0;
         G_SPEED_PROFILE_LOCK = false;
     }
 
-    // Catch All
+    // Catch all
     else {}
 }
 
 void
 StepProfile ()
 {
-    // Motor Start
+    // Motor start
     if (G_MOTOR_STATE == STP_START) {
         G_STEP_PROFILE_LOCK = true;
-        // Set the Start Speed (Cannot Overflow the Timer Register)
+        // Set the start speed (cannot overflow the timer register)
         G_CUR_NUM_STEPS = 0;
-        // Value Check
+        // Value check
         if (G_START_STOP_SPEED > G_TARGET_SPEED)
             G_START_STOP_SPEED = G_TARGET_SPEED;
         G_CUR_SPEED = G_START_STOP_SPEED;
         TA1CCR0 = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
-        // Determine the Acceleration Increment
-        // Watchdog Timer Fires Every 16.384ms, ~61.035 Interupts/s (Accel Rate Cannot be Less Than 64)
-        // Round Accelerat Rate to Increment of 64
+        // Determine the acceleration increment
+        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate cannot be less than 64)
+        // Round accelerat rate to increment of 64
         G_ACCEL_RATE = (G_ACCEL_RATE >> 6) << 6;
         G_SPEED_INCR = G_ACCEL_RATE >> 6;
 
-        // Determine the Number of Steps to Accel/Decel
+        // Determine the number of steps to accel/decel
         // TODO explain this
         float time = (float)(G_TARGET_SPEED - G_START_STOP_SPEED)/(float)G_ACCEL_RATE;
         G_STEPS_TO_ACCEL = ((G_ACCEL_RATE >> 1) * (time * time)) + (G_START_STOP_SPEED * time);
         if (G_STEPS_TO_ACCEL > (G_TOTAL_NUM_STEPS >> 1))
             G_STEPS_TO_ACCEL = G_TOTAL_NUM_STEPS >> 1;
 
-        // Set the Timer Output Low
-        TA1CCTL1 = OUTMOD_0;
-        P2OUT &= ~STEP_AIN1;
-        // Setup the Output and Interrupt
-        TA1CCTL0 = CCIE;
-        TA1CCTL1 = OUTMOD_3 | CCIE;
-        // Start the Timer
-        TA1CTL = TASSEL_2 | MC_1 | TACLR;
+        // Set the timer output low
+        TA1CCTL1 =  OUTMOD_0;
+        P2OUT   &= ~STEP_AIN1;
+        // Setup the output and interrupt
+        TA1CCTL0 =  CCIE;
+        TA1CCTL1 =  OUTMOD_3 | CCIE;
+        // Start the timer
+        TA1CTL   =  TASSEL_2 | MC_1 | TACLR;
 
-        // Setup Watchdog Timer as an Interval Timer for Accel/Decel Updates
-        WDTCTL = WDT_MDLY_32;
-        IE1 |= WDTIE;
+        // Setup watchdog timer as an interval timer for accel/decel updates
+        WDTCTL   =  WDT_MDLY_32;
+        IE1     |=  WDTIE;
     }
 
-    // Motor Accelerate
+    // Motor accelerate
     else if ((G_MOTOR_STATE == STP_ACCEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
-        // Increase Speed
+        // Increase speed
         if ((G_CUR_SPEED + G_SPEED_INCR) < G_TARGET_SPEED) {
-            // Calcute Next Speed Value (Cannot Overflow the Timer Register)
+            // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED + G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-        // Load Target Speed
+        // Load target speed
         else {
-            // Calcute Target Speed Value (Cannot Overflow the Timer Register)
+            // Calcute target speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_TARGET_SPEED;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_TARGET_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_TARGET_SPEED) >> 1;
@@ -818,20 +819,20 @@ StepProfile ()
         }
     }
 
-    // Motor Decelerate
+    // Motor decelerate
     else if ((G_MOTOR_STATE == STP_DECEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
-        // Decrease Speed
+        // Decrease speed
         if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) && (G_CUR_SPEED > G_SPEED_INCR)) {
-            // Calcute Next Speed Value (Cannot Overflow the Timer Register)
+            // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-        // Load Stop Speed
+        // Load stop speed
         else {
-            // Calcute Stop Speed Value (Cannot Overflow the Timer Register)
+            // Calcute stop speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_START_STOP_SPEED;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
@@ -839,20 +840,20 @@ StepProfile ()
         }
     }
 
-    // Motor Stop
+    // Motor stop
     else if (G_MOTOR_STATE == STP_STOP) {
-        // Stop Watchdog Interval Timer
-        WDTCTL = WDTPW | WDTHOLD;
-        IE1 &= ~WDTIE;
-        // Disable Timer
-        TA1CTL = TASSEL_2 | MC_0 | TACLR;
-        // End Step Profle
+        // Stop watchdog interval timer
+        WDTCTL =  WDTPW | WDTHOLD;
+        IE1   &= ~WDTIE;
+        // Disable timer
+        TA1CTL =  TASSEL_2 | MC_0 | TACLR;
+        // End step profle
         G_CUR_SPEED = 0;
         G_STEP_PROFILE = false;
         G_STEP_PROFILE_LOCK = false;
     }
 
-    // Catch All
+    // Catch all
     else {}
 }
 

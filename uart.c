@@ -79,9 +79,9 @@ uartInit (void)
     P1DIR |= UART_TXD;
     P1DIR &= ~UART_RXD;
 
-    /* Set TXD Idle as Mark = '1' */
+    /* Set TXD idle as mark = '1' */
     TACCTL0 = OUT;
-    /* Sync, Neg Edge, Capture, Int */
+    /* Sync, neg edge, capture, int */
     TACCTL1 = SCS + CM1 + CAP + CCIE;
     /* Clear TA0 counter, SMCLK, start in continuous mode */
     TACTL = TACLR + TASSEL_2 + MC_2;
@@ -104,7 +104,7 @@ uartTxByte (unsigned char byte)
 #if HARDWARE_UART
     /* USCI_A0 TX buffer ready? */
     while (!(IFG2&UCA0TXIFG));
-    /* transmite data */
+    /* Transmit data */
     UCA0TXBUF = byte;
 #else
     /* Transmit data packet */
@@ -149,17 +149,16 @@ Timer_A0_ISR (void)
 {
     static unsigned char txBitCnt = 10;
 
-    TACCR0 += UART_TBIT;                    // Add Offset to CCRx
+    TACCR0 += UART_TBIT;                    // Add offset to CCRx
     if (--txBitCnt == 0)                    // All bits TXed?
     {
         TACCTL0 &= ~CCIE;                   // All bits TXed, disable interrupt
         txBitCnt = 10;
     } else {
-        if (txData & 0x01) {
-            TACCTL0 &= ~OUTMOD2;            // TX Mark '1'
-        } else {
-            TACCTL0 |= OUTMOD2;             // TX Space '0'
-        }
+        if (txData & 0x01)
+            TACCTL0 &= ~OUTMOD2;            // TX mark '1'
+        else
+            TACCTL0 |= OUTMOD2;             // TX space '0'
         txData >>= 1;
     }
 }
@@ -181,25 +180,24 @@ Timer_A1_ISR (void)
     static unsigned char rxData     = 0;
 
     switch (__even_in_range (TA0IV, TA0IV_TAIFG)) { // Use calculated branching
-    case TA0IV_TACCR1:                        // TACCR1 CCIFG - UART RX
-        TACCR1 += UART_TBIT;                 // Add Offset to CCRx
-        if (TACCTL1 & CAP) {                 // Capture mode = start bit edge
-            TACCTL1 &= ~CAP;                 // Switch capture to compare mode
-            TACCR1 += UART_TBIT_DIV_2;       // Point CCRx to middle of D0
+    case TA0IV_TACCR1:                              // TACCR1 CCIFG - UART RX
+        TACCR1 += UART_TBIT;                        // Add offset to CCRx
+        if (TACCTL1 & CAP) {                        // Capture mode = start bit edge
+            TACCTL1 &= ~CAP;                        // Switch capture to compare mode
+            TACCR1 += UART_TBIT_DIV_2;              // Point CCRx to middle of D0
         } else {
             rxData >>= 1;
-            if (TACCTL1 & SCCI) {            // Get bit waiting in receive latch
+            if (TACCTL1 & SCCI)                     // Get bit waiting in receive latch
                 rxData |= 0x80;
-            }
             rxBitCnt--;
-            if (rxBitCnt == 0) {             // All bits RXed?
-                rxBitCnt = 8;                // Re-load bit counter
-                TACCTL1 |= CAP;              // Switch compare to capture mode
+            if (rxBitCnt == 0) {                    // All bits RXed?
+                rxBitCnt = 8;                       // Re-load bit counter
+                TACCTL1 |= CAP;                     // Switch compare to capture mode
 
                 /* Parse received command immediately */
-                receivedDataCommand(rxData);
+                receivedDataCommand (rxData);
 
-                __bic_SR_register_on_exit(LPM0_bits);  // Clear LPM0 bits from 0(SR)
+                __bic_SR_register_on_exit (LPM0_bits);  // Clear LPM0 bits from 0(SR)
             }
         }
         break;

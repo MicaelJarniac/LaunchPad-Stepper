@@ -40,9 +40,9 @@
 #include "uart.h"
 #include "monitor.h"
 
-#define RW_CMD          0x80
+#define RW_CMD              0x80
 
-#define EXTENSION_BYTE  0x07
+#define EXTENSION_BYTE      0x07
 
 // RW CMD TYPE
 #define READ                1
@@ -53,15 +53,15 @@
 // ADDRESSIBLE SIZE
 #define ADDRESSIBLE_32_BIT  1
 #define ADDRESSIBLE_16_BIT  0
-// Override these depends on target: CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
+// Override these depends on target:
+// CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
 #define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
 
-unsigned char gInCmdBuffer[CMD_BUFFER_SIZE];
-unsigned short gInCmdBufferIdx = 0;
+unsigned char           gInCmdBuffer[CMD_BUFFER_SIZE];
+unsigned short          gInCmdBufferIdx = 0;
 volatile unsigned short gInCmdSkipCount;
 
-void
-ClearBufferRelatedParam ();
+void ClearBufferRelatedParam ();
 
 // Override these depends on target
 int
@@ -119,7 +119,9 @@ WriteByteToInCmdBuffer (unsigned char d)
 }
 
 int
-GetTransferSizeInMAU () //transfer size refer to the words to read/write of a given cmd, not the number of bytes for the whole cmd packet
+GetTransferSizeInMAU () // Transfer size refer to the words to read/write of a
+                        // given cmd, not the number of bytes for the whole cmd
+                        // packet
 {
     return (gInCmdBuffer[0] & 0x3f);
 }
@@ -137,128 +139,123 @@ GetInputCmdType ()
 }
 
 int
-GetRWFlag ()//equivalent to endianness on the MAU in transmission
+GetRWFlag () // Equivalent to endianness on the MAU in transmission
 {
-    int ret = ((gInCmdBuffer[0] >> 6) & 0x1); //
+    int ret = ((gInCmdBuffer[0] >> 6) & 0x1);
     return ret;
 }
 
 unsigned char
 *GetInCmdAddress ()
 {
-    unsigned char *addr = 0;
-    unsigned long addr_value = 0;
+    unsigned char *addr         = 0;
+    unsigned long  addr_value   = 0;
     int i = 0;
-    int addressSize = 4; // always use 32bit address
-    for (; i < addressSize; i++) {
-        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 * (addressSize - 1 - i)); //big endian
-    }
+    int addressSize = 4; // Always use 32bit address
+    for (; i < addressSize; i++)
+        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 * (addressSize - 1 - i)); // Big endian
 
     addr = (unsigned char*) addr_value;
     return addr;
 }
 
-void WriteMAUToCOM(unsigned char d)
+void
+WriteMAUToCOM (unsigned char d)
 {
-    int MAUSize = GetSizeOfMAUIn8bitByte();
+    int MAUSize = GetSizeOfMAUIn8bitByte ();
 
-    switch (MAUSize)
-    {
+    switch (MAUSize) {
     case 1:
-        Write8bitByteToCOM(d);
+        Write8bitByteToCOM (d);
         break;
+
     case 2:
-    {
         unsigned char MAU[2];
         MAU[0] = (unsigned char)(d & 0xff);
         MAU[1] = (unsigned char)(d >> 8);
-        if (GetTargetEndianness() == LITTLE_ENDIAN)
-        {
-            Write8bitByteToCOM(MAU[0]);
-            Write8bitByteToCOM(MAU[1]);
+        if (GetTargetEndianness () == LITTLE_ENDIAN) {
+            Write8bitByteToCOM (MAU[0]);
+            Write8bitByteToCOM (MAU[1]);
         } else {
-            Write8bitByteToCOM(MAU[1]);
-            Write8bitByteToCOM(MAU[0]);
+            Write8bitByteToCOM (MAU[1]);
+            Write8bitByteToCOM (MAU[0]);
         }
-    }
-    break;
-    default://only handles 8bit, 16bit MAU
+        break;
+
+    default: // Only handles 8bit, 16bit MAU
         break;
     }
 }
 
-unsigned char GetWriteCmdDataMAU(int idx)
+unsigned char
+GetWriteCmdDataMAU (int idx)
 {
-    unsigned char startIdx = 1 + 4;
+    unsigned char startIdx  = 1 + 4;
 
-    unsigned char val = 0;
-    int MAUSize = GetSizeOfMAUIn8bitByte();
+    unsigned char val       = 0;
+    int MAUSize = GetSizeOfMAUIn8bitByte ();
     int byteOffset = idx*MAUSize;
 
-    switch (MAUSize)
-    {
+    switch (MAUSize) {
     case 1:
         val = gInCmdBuffer[startIdx + byteOffset];
         break;
+
     case 2:
-        if (GetTargetEndianness() == LITTLE_ENDIAN)
-        {
-            val = ( gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) | gInCmdBuffer[startIdx + byteOffset];
-        } else {
-            val = ( gInCmdBuffer[startIdx + byteOffset] | gInCmdBuffer[startIdx + byteOffset + 1] << 8 );
-        }
+        if (GetTargetEndianness () == LITTLE_ENDIAN)
+            val = (gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) | gInCmdBuffer[startIdx + byteOffset];
+        else
+            val = (gInCmdBuffer[startIdx + byteOffset] | gInCmdBuffer[startIdx + byteOffset + 1] << 8);
         break;
-    default://only handles 8bit, 16bit MAU
+
+    default: // Only handles 8bit, 16bit MAU
         break;
     }
 
     return val;
 }
 
-void ClearBufferRelatedParam()
+void
+ClearBufferRelatedParam ()
 {
     gInCmdSkipCount = 0;
     gInCmdBufferIdx = 0;
 }
 
-void MemAccessCmd(int RW)
+void
+MemAccessCmd (int RW)
 {
-    unsigned short MAUsToRead = 0;
-    unsigned char dataChar = 0;
-    unsigned char* addr = GetInCmdAddress();
-    unsigned short i, j;
+    unsigned short  MAUsToRead  = 0;
+    unsigned char   dataChar    = 0;
+    unsigned char  *addr        = GetInCmdAddress ();
+    unsigned short  i, j;
 
-    for ( j = 0; j < 1; j++ )
-    {
-        Write8bitByteToCOM(gInCmdBuffer[j]);
-    }
+    for (j = 0; j < 1; j++)
+        Write8bitByteToCOM (gInCmdBuffer[j]);
 
-    MAUsToRead = GetTransferSizeInMAU();
-    for ( i = 0; i < MAUsToRead; i++ )
-    {
-        if (RW == READ)
-        {
+    MAUsToRead = GetTransferSizeInMAU ();
+    for (i = 0; i < MAUsToRead; i++) {
+        if (RW == READ) {
             dataChar = *(addr + i);
-            WriteMAUToCOM(dataChar);
-        } else { //WRITE
-            dataChar = GetWriteCmdDataMAU(i);
+            WriteMAUToCOM (dataChar);
+        } else { // WRITE
+            dataChar = GetWriteCmdDataMAU (i);
             *(addr + i) = dataChar;
         }
     }
 }
 
-int ProcessCommand()
+int
+ProcessCommand ()
 {
-    if ( VerifyInputCmdHeaders() )
-    {
+    if (VerifyInputCmdHeaders ())
         return 1;
-    }
 
-    switch ( GetInputCmdType() )
-    {
+    switch (GetInputCmdType ()) {
     case RW_CMD:
-        MemAccessCmd(GetRWFlag());
+        MemAccessCmd (GetRWFlag ());
         break;
+
     default:
         return 1;
     }
@@ -266,36 +263,32 @@ int ProcessCommand()
     return 0;
 }
 
-void receivedDataCommand(unsigned char d) // only lower byte will be used even if MAU is bigger than 1 byte
+void
+receivedDataCommand (unsigned char d) // Only lower byte will be used even if
+                                      // MAU is bigger than 1 byte
 {
-    WriteByteToInCmdBuffer(d);
+    WriteByteToInCmdBuffer (d);
 
-    if (gInCmdSkipCount > 0)
-    {
+    if (gInCmdSkipCount > 0) {
         gInCmdSkipCount--;
         return;
     }
 
-    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0)
-    { //wrong input header, clear cmd buffer
-        if ( VerifyInputCmdHeaders() )
-        {
-            ClearBufferRelatedParam();
+    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) { // Wrong input header, clear cmd buffer
+        if (VerifyInputCmdHeaders ()) {
+            ClearBufferRelatedParam ();
             return;
         }
 
         if (gInCmdBufferIdx == 1) {
-            if (GetRWFlag() == WRITE)
-            {
-                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU() * GetSizeOfMAUIn8bitByte();
-            } else {
-                gInCmdSkipCount = 4 - 1 ;
-            }
+            if (GetRWFlag () == WRITE)
+                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () * GetSizeOfMAUIn8bitByte ();
+            else
+                gInCmdSkipCount = 4 - 1;
         } else {
-            ProcessCommand();
-            ClearBufferRelatedParam();
+            ProcessCommand ();
+            ClearBufferRelatedParam ();
         }
         return;
     }
-
 }
