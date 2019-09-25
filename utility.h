@@ -72,9 +72,12 @@
 #define REGREAD     0x80
 
 // Default defines
-#define	DEFAULT_START_STOP_SPEED    128         // Initial speed of the motor (PPS)
-#define DEFAULT_TARGET_SPEED        512         // Target speed of the motor (PPS)
-#define DEFAULT_ACCEL_RATE          128         // Acceleration/deceleration rate (PPSPS)
+#define	DEFAULT_START_STOP_SPEED    128         // Initial speed of the
+                                                // motor (PPS)
+#define DEFAULT_TARGET_SPEED        512         // Target speed of the
+                                                // motor (PPS)
+#define DEFAULT_ACCEL_RATE          128         // Acceleration/deceleration
+                                                // rate (PPSPS)
 #define DEFAULT_NUM_STEPS           1024        // Number of steps
 
 // Custom types
@@ -127,28 +130,39 @@ extern unsigned int G_READ_ADDR;          // SPI address
 extern unsigned int G_READ_DATA;          // SPI data
 
 // Stepper motion profile
-extern unsigned int G_START_STOP_SPEED;   // Initial and final speed of the motor (PPS)
+extern unsigned int G_START_STOP_SPEED;   // Initial and final speed of the
+                                          // motor (PPS)
 extern unsigned int G_TARGET_SPEED;       // Target speed of the motor (PPS)
-extern unsigned int G_ACCEL_RATE;         // Acceleration/deceleration rate (PPSPS)
-extern unsigned int G_TOTAL_NUM_STEPS;    // Number of steps to advance the motor
+extern unsigned int G_ACCEL_RATE;         // Acceleration/deceleration
+                                          // rate (PPSPS)
+extern unsigned int G_TOTAL_NUM_STEPS;    // Number of steps to advance the
+                                          // motor
 extern unsigned int G_STEPS_TO_ACCEL;     // Number of steps to accel/decel
-extern MotorState G_MOTOR_STATE;          // Status of the speed profile state machine
-extern boolean G_SPEED_PROFILE;           // Start/stop the stepper motion profile
+extern MotorState G_MOTOR_STATE;          // Status of the speed profile
+                                          // state machine
+extern boolean G_SPEED_PROFILE;           // Start/stop the stepper motion
+                                          // profile
 extern boolean G_SPEED_PROFILE_LOCK;      // Lock the speed profile
-extern boolean G_STEP_PROFILE;            // Start/stop a specific number of steps
+extern boolean G_STEP_PROFILE;            // Start/stop a specific number of
+                                          // steps
 extern boolean G_STEP_PROFILE_LOCK;       // Lock the step profile
 
 // Motor status
-extern unsigned int G_CUR_NUM_STEPS;      // Number of steps the motor has advanced
+extern unsigned int G_CUR_NUM_STEPS;      // Number of steps the motor has
+                                          // advanced
 extern unsigned int G_CUR_SPEED;          // Current speed of the motor
-extern unsigned int G_CUR_SPEED_TEMP;     // Next speed after accel/decel update
-extern unsigned int G_SPEED_INCR;         // Amount to increment/decrement speed each accel/decel update
-extern boolean G_ACCEL_FLAG;              // Signals to calculate next speed value
+extern unsigned int G_CUR_SPEED_TEMP;     // Next speed after accel/decel
+                                          // update
+extern unsigned int G_SPEED_INCR;         // Amount to increment/decrement
+                                          // speed each accel/decel update
+extern boolean G_ACCEL_FLAG;              // Signals to calculate next speed
+                                          // value
 
 // Holding values for timer A1 CCR registers
 extern unsigned int G_TA1CCR0_TEMP;
 extern unsigned int G_TA1CCR1_TEMP;
-extern boolean G_LOAD_CCR_VALS;           // Flag to load the temporary CCR register values
+extern boolean G_LOAD_CCR_VALS;           // Flag to load the temporary CCR
+                                          // register values
 
 // DRV8711 GPIO
 extern gpio G_nSLEEP;                     // Logic low to enter low power sleep mode

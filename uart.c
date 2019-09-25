@@ -182,22 +182,28 @@ Timer_A1_ISR (void)
     switch (__even_in_range (TA0IV, TA0IV_TAIFG)) { // Use calculated branching
     case TA0IV_TACCR1:                              // TACCR1 CCIFG - UART RX
         TACCR1 += UART_TBIT;                        // Add offset to CCRx
-        if (TACCTL1 & CAP) {                        // Capture mode = start bit edge
-            TACCTL1 &= ~CAP;                        // Switch capture to compare mode
-            TACCR1 += UART_TBIT_DIV_2;              // Point CCRx to middle of D0
+        if (TACCTL1 & CAP) {                        // Capture mode = start bit
+                                                    // edge
+            TACCTL1 &= ~CAP;                        // Switch capture to
+                                                    // compare mode
+            TACCR1 += UART_TBIT_DIV_2;              // Point CCRx to middle of
+                                                    // D0
         } else {
             rxData >>= 1;
-            if (TACCTL1 & SCCI)                     // Get bit waiting in receive latch
+            if (TACCTL1 & SCCI)                     // Get bit waiting in
+                                                    // receive latch
                 rxData |= 0x80;
             rxBitCnt--;
             if (rxBitCnt == 0) {                    // All bits RXed?
                 rxBitCnt = 8;                       // Re-load bit counter
-                TACCTL1 |= CAP;                     // Switch compare to capture mode
+                TACCTL1 |= CAP;                     // Switch compare to
+                                                    // capture mode
 
                 /* Parse received command immediately */
                 receivedDataCommand (rxData);
 
-                __bic_SR_register_on_exit (LPM0_bits);  // Clear LPM0 bits from 0(SR)
+                __bic_SR_register_on_exit (LPM0_bits);  // Clear LPM0 bits from
+                                                        // 0(SR)
             }
         }
         break;

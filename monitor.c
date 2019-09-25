@@ -153,7 +153,8 @@ unsigned char
     int i = 0;
     int addressSize = 4; // Always use 32bit address
     for (; i < addressSize; i++)
-        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 * (addressSize - 1 - i)); // Big endian
+        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
+                                      (addressSize - 1 - i)); // Big endian
 
     addr = (unsigned char*) addr_value;
     return addr;
@@ -203,9 +204,11 @@ GetWriteCmdDataMAU (int idx)
 
     case 2:
         if (GetTargetEndianness () == LITTLE_ENDIAN)
-            val = (gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) | gInCmdBuffer[startIdx + byteOffset];
+            val = (gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) |
+                  gInCmdBuffer[startIdx + byteOffset];
         else
-            val = (gInCmdBuffer[startIdx + byteOffset] | gInCmdBuffer[startIdx + byteOffset + 1] << 8);
+            val = (gInCmdBuffer[startIdx + byteOffset] |
+                   gInCmdBuffer[startIdx + byteOffset + 1] << 8);
         break;
 
     default: // Only handles 8bit, 16bit MAU
@@ -274,7 +277,8 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
         return;
     }
 
-    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) { // Wrong input header, clear cmd buffer
+    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) { // Wrong input header,
+                                                       // clear cmd buffer
         if (VerifyInputCmdHeaders ()) {
             ClearBufferRelatedParam ();
             return;
@@ -282,7 +286,8 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
 
         if (gInCmdBufferIdx == 1) {
             if (GetRWFlag () == WRITE)
-                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () * GetSizeOfMAUIn8bitByte ();
+                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () *
+                                  GetSizeOfMAUIn8bitByte ();
             else
                 gInCmdSkipCount = 4 - 1;
         } else {

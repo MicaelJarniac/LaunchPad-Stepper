@@ -445,7 +445,8 @@ UpdateDRV8711Registers ()
 
     // Manual SPI write
     if (G_MANUAL_WRITE == true) {
-        unsigned char byteHi = REGWRITE | (G_WRITE_ADDR << 4) | (G_WRITE_DATA >> 8);
+        unsigned char byteHi = REGWRITE | (G_WRITE_ADDR << 4) |
+                               (G_WRITE_DATA >> 8);
         unsigned char byteLo = G_WRITE_DATA;
         SPI_DRV8711_ReadWrite (byteHi, byteLo);
         G_MANUAL_WRITE = false;
@@ -466,8 +467,11 @@ WriteAllRegisters ()
     unsigned char dataLo = 0x00;
 
     // Write CTRL register
-    dataHi = REGWRITE | (G_CTRL_REG.Address << 4) | (G_CTRL_REG.DTIME << 2) | (G_CTRL_REG.ISGAIN);
-    dataLo = (G_CTRL_REG.EXSTALL << 7) | (G_CTRL_REG.MODE << 3) | (G_CTRL_REG.RSTEP << 2) | (G_CTRL_REG.RDIR << 1) | (G_CTRL_REG.ENBL);
+    dataHi = REGWRITE | (G_CTRL_REG.Address << 4) | (G_CTRL_REG.DTIME << 2) |
+             (G_CTRL_REG.ISGAIN);
+    dataLo = (G_CTRL_REG.EXSTALL << 7) | (G_CTRL_REG.MODE << 3) |
+             (G_CTRL_REG.RSTEP << 2) | (G_CTRL_REG.RDIR << 1) |
+             (G_CTRL_REG.ENBL);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
     // Write TORQUE register
@@ -491,18 +495,24 @@ WriteAllRegisters ()
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
     // Write STALL register
-    dataHi = REGWRITE | (G_STALL_REG.Address << 4) | (G_STALL_REG.VDIV << 2) | (G_STALL_REG.SDCNT);
+    dataHi = REGWRITE | (G_STALL_REG.Address << 4) | (G_STALL_REG.VDIV << 2) |
+             (G_STALL_REG.SDCNT);
     dataLo = G_STALL_REG.SDTHR;
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
     // Write DRIVE register
-    dataHi = REGWRITE | (G_DRIVE_REG.Address << 4) | (G_DRIVE_REG.IDRIVEP << 2) | (G_DRIVE_REG.IDRIVEN);
-    dataLo = (G_DRIVE_REG.TDRIVEP << 6) | (G_DRIVE_REG.TDRIVEN << 4) | (G_DRIVE_REG.OCPDEG << 2) | (G_DRIVE_REG.OCPTH);
+    dataHi = REGWRITE | (G_DRIVE_REG.Address << 4) |
+             (G_DRIVE_REG.IDRIVEP << 2) | (G_DRIVE_REG.IDRIVEN);
+    dataLo = (G_DRIVE_REG.TDRIVEP << 6) | (G_DRIVE_REG.TDRIVEN << 4) |
+             (G_DRIVE_REG.OCPDEG << 2) | (G_DRIVE_REG.OCPTH);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 
     // Write STATUS register
     dataHi = REGWRITE | (G_STATUS_REG.Address << 4);
-    dataLo = (G_STATUS_REG.STDLAT << 7) | (G_STATUS_REG.STD << 6) | (G_STATUS_REG.UVLO << 5) | (G_STATUS_REG.BPDF << 4) | (G_STATUS_REG.APDF << 3) | (G_STATUS_REG.BOCP << 2) | (G_STATUS_REG.AOCP << 1) | (G_STATUS_REG.OTS);
+    dataLo = (G_STATUS_REG.STDLAT << 7) | (G_STATUS_REG.STD << 6) |
+             (G_STATUS_REG.UVLO << 5) | (G_STATUS_REG.BPDF << 4) |
+             (G_STATUS_REG.APDF << 3) | (G_STATUS_REG.BOCP << 2) |
+             (G_STATUS_REG.AOCP << 1) | (G_STATUS_REG.OTS);
     SPI_DRV8711_ReadWrite (dataHi, dataLo);
 }
 
@@ -582,7 +592,8 @@ void
 UpdateFullScaleCurrent ()
 {
     // Calculate the 100% chopping current level
-    if ((G_CTRL_REG.ISGAIN != G_ISGAIN_OLD) || (G_TORQUE_REG.TORQUE != G_TORQUE_OLD)) {
+    if ((G_CTRL_REG.ISGAIN != G_ISGAIN_OLD) ||
+        (G_TORQUE_REG.TORQUE != G_TORQUE_OLD)) {
         // Parse ISGAIN
         unsigned int temp_isgain;
         if (G_CTRL_REG.ISGAIN == 0)
@@ -597,7 +608,8 @@ UpdateFullScaleCurrent ()
             temp_isgain = 5;
 
         // Calculate floating point value
-        G_FULL_SCALE_CURRENT = (2.75 * (float)G_TORQUE_REG.TORQUE) / (256 * (float)temp_isgain * 0.05);
+        G_FULL_SCALE_CURRENT = (2.75 * (float)G_TORQUE_REG.TORQUE) /
+                               (256 * (float)temp_isgain * 0.05);
         G_ISGAIN_OLD = G_CTRL_REG.ISGAIN;
         G_TORQUE_OLD = G_TORQUE_REG.TORQUE;
     }
@@ -613,19 +625,23 @@ UpdateStepperMotionProfile ()
             G_MOTOR_STATE = SPD_START;
         }
         // Speed profile motor accelerating
-        else if ((G_CUR_SPEED < G_TARGET_SPEED) && (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
+        else if ((G_CUR_SPEED < G_TARGET_SPEED) &&
+                 (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_ACCEL;
         }
         // Speed profile motor stable
-        else if ((G_CUR_SPEED == G_TARGET_SPEED) && (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
+        else if ((G_CUR_SPEED == G_TARGET_SPEED) &&
+                 (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_STABLE;
         }
         // Speed profile motor decelerating
-        else if ((G_CUR_SPEED > G_START_STOP_SPEED) && (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
+        else if ((G_CUR_SPEED > G_START_STOP_SPEED) &&
+                 (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_DECEL;
         }
         // Speed profile motor stop
-        else if ((G_CUR_SPEED == G_START_STOP_SPEED) && (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
+        else if ((G_CUR_SPEED == G_START_STOP_SPEED) &&
+                 (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = SPD_STOP;
         }
         // Step profile motor start
@@ -633,19 +649,24 @@ UpdateStepperMotionProfile ()
             G_MOTOR_STATE = STP_START;
         }
         // Step profile motor accelerating
-        else if ((G_CUR_NUM_STEPS < G_STEPS_TO_ACCEL) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        else if ((G_CUR_NUM_STEPS < G_STEPS_TO_ACCEL) &&
+                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_ACCEL;
         }
         // Step profile motor stable
-        else if ((G_CUR_NUM_STEPS < (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        else if ((G_CUR_NUM_STEPS < (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
+                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_STABLE;
         }
         // Step profile motor decelerating
-        else if ((G_CUR_NUM_STEPS >= (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) && (G_CUR_NUM_STEPS < G_TOTAL_NUM_STEPS) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        else if ((G_CUR_NUM_STEPS >= (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
+                 (G_CUR_NUM_STEPS < G_TOTAL_NUM_STEPS) &&
+                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_DECEL;
         }
         // Step profile motor stop
-        else if ((G_CUR_NUM_STEPS >= G_TOTAL_NUM_STEPS) && (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        else if ((G_CUR_NUM_STEPS >= G_TOTAL_NUM_STEPS) &&
+                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
             G_MOTOR_STATE = STP_STOP;
         }
         // Step profile force motor stop
@@ -680,7 +701,8 @@ SpeedProfile ()
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
         // Determine the acceleration increment
-        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate cannot be less than 64)
+        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate
+        // cannot be less than 64)
         // Round accelerat rate to increment of 64
         G_ACCEL_RATE = (G_ACCEL_RATE >> 6) << 6;
         G_SPEED_INCR = G_ACCEL_RATE >> 6;
@@ -724,7 +746,8 @@ SpeedProfile ()
     else if ((G_MOTOR_STATE == SPD_DECEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
         // Decrease speed
-        if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) && (G_CUR_SPEED > G_SPEED_INCR)) {
+        if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) &&
+            (G_CUR_SPEED > G_SPEED_INCR)) {
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
@@ -772,15 +795,18 @@ StepProfile ()
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
         // Determine the acceleration increment
-        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate cannot be less than 64)
+        // Watchdog timer fires every 16.384ms, ~61.035 interupts/s (accel rate
+        // cannot be less than 64)
         // Round accelerat rate to increment of 64
         G_ACCEL_RATE = (G_ACCEL_RATE >> 6) << 6;
         G_SPEED_INCR = G_ACCEL_RATE >> 6;
 
         // Determine the number of steps to accel/decel
         // TODO explain this
-        float time = (float)(G_TARGET_SPEED - G_START_STOP_SPEED)/(float)G_ACCEL_RATE;
-        G_STEPS_TO_ACCEL = ((G_ACCEL_RATE >> 1) * (time * time)) + (G_START_STOP_SPEED * time);
+        float time = (float)(G_TARGET_SPEED - G_START_STOP_SPEED) /
+                     (float)G_ACCEL_RATE;
+        G_STEPS_TO_ACCEL = ((G_ACCEL_RATE >> 1) * (time * time)) +
+                           (G_START_STOP_SPEED * time);
         if (G_STEPS_TO_ACCEL > (G_TOTAL_NUM_STEPS >> 1))
             G_STEPS_TO_ACCEL = G_TOTAL_NUM_STEPS >> 1;
 
@@ -823,7 +849,8 @@ StepProfile ()
     else if ((G_MOTOR_STATE == STP_DECEL) && (G_ACCEL_FLAG == true)) {
         G_ACCEL_FLAG = false;
         // Decrease speed
-        if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) && (G_CUR_SPEED > G_SPEED_INCR)) {
+        if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) &&
+            (G_CUR_SPEED > G_SPEED_INCR)) {
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
