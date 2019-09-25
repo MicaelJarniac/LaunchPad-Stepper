@@ -33,9 +33,9 @@
 /*******************************************************************************
  *
  *  utility.c - Definition file for utility functions
- *  Nick Oborny
- *  BOOST-DRV8711_FIRMWARE
- *  3/12/2014
+ *  Micael Jarniac
+ *  LaunchPad Stepper
+ *  25/09/2019
  *
  ******************************************************************************/
 
