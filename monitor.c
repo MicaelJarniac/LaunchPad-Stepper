@@ -150,11 +150,11 @@ unsigned char
 {
     unsigned char *addr         = 0;
     unsigned long  addr_value   = 0;
-    int i = 0;
     int addressSize = 4; // Always use 32bit address
-    for (; i < addressSize; i++)
+    for (int i = 0; i < addressSize; i++) {
         addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
                                       (addressSize - 1 - i)); // Big endian
+    }
 
     addr = (unsigned char*) addr_value;
     return addr;
@@ -231,13 +231,12 @@ MemAccessCmd (int RW)
     unsigned short  MAUsToRead  = 0;
     unsigned char   dataChar    = 0;
     unsigned char  *addr        = GetInCmdAddress ();
-    unsigned short  i, j;
 
-    for (j = 0; j < 1; j++)
+    for (unsigned short j = 0; j < 1; j++)
         Write8bitByteToCOM (gInCmdBuffer[j]);
 
     MAUsToRead = GetTransferSizeInMAU ();
-    for (i = 0; i < MAUsToRead; i++) {
+    for (unsigned short i = 0; i < MAUsToRead; i++) {
         if (RW == READ) {
             dataChar = *(addr + i);
             WriteMAUToCOM (dataChar);
@@ -285,10 +284,10 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
         }
 
         if (gInCmdBufferIdx == 1) {
-            if (GetRWFlag () == WRITE)
+            if (GetRWFlag () == WRITE) {
                 gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () *
                                   GetSizeOfMAUIn8bitByte ();
-            else
+            } else
                 gInCmdSkipCount = 4 - 1;
         } else {
             ProcessCommand ();

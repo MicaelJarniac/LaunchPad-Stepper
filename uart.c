@@ -64,6 +64,7 @@ uartInit (void)
     /* SMCLK */
     UCA0CTL1 |= UCSSEL_2;
     /* 4MHz 9600 */
+    // TODO Replace hard-coded numbers
     UCA0BR0 = 208;
     UCA0BR1 = 0;
     /* Modulation UCBRSx = 1 */

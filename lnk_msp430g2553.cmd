@@ -31,7 +31,7 @@
 /* ============================================================================ */
 
 /******************************************************************************/
-/* lnk_msp430g2553.cmd - LINKER COMMAND FILE FOR LINKING MSP430G2553 PROGRAMS     */
+/* lnk_msp430g2553.cmd - LINKER COMMAND FILE FOR LINKING MSP430G2553 PROGRAMS */
 /*                                                                            */
 /*   Usage:  lnk430 <obj files...>    -o <out file> -m <map file> lnk.cmd     */
 /*           cl430  <src files...> -z -o <out file> -m <map file> lnk.cmd     */
@@ -129,4 +129,3 @@ SECTIONS
 /****************************************************************************/
 
 -l msp430g2553.cmd
-

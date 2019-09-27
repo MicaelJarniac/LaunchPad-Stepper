@@ -270,21 +270,21 @@ UpdateGPIO ()
 {
     // Update the GPIO pins from global variables
     // nSLEEP
-    if (G_nSLEEP == high)
+    if (G_nSLEEP)
         P1OUT |=  nSLEEP;
     else
         P1OUT &= ~nSLEEP;
 
     // RESET
-    if (G_RESET == high)
+    if (G_RESET)
         P2OUT |=  RESET;
     else
         P2OUT &= ~RESET;
 
     // DC motor mode
-    if (G_BYPASS_INDEXER == true) {
+    if (G_BYPASS_INDEXER) {
         // Change from indexer to DC motor mode
-        if (G_BYPASS_INDEXER_OLD == false) {
+        if (!G_BYPASS_INDEXER_OLD) {
             // Stop watchdog interval timer
             WDTCTL =  WDTPW | WDTHOLD;
             IE1   &= ~WDTIE;
@@ -317,32 +317,32 @@ UpdateGPIO ()
         }
 
         // STEP_AIN1
-        if (G_STEP_AIN1 == high)
+        if (G_STEP_AIN1)
             P2OUT |=  STEP_AIN1;
         else
             P2OUT &= ~STEP_AIN1;
 
         // DIR_AIN2
-        if (G_DIR_AIN2 == high)
+        if (G_DIR_AIN2)
             P2OUT |=  DIR_AIN2;
         else
             P2OUT &= ~DIR_AIN2;
 
         // BIN1
-        if (G_BIN1 == high)
+        if (G_BIN1)
             P2OUT |=  BIN1;
         else
             P2OUT &= ~BIN1;
 
         // BIN2
-        if (G_BIN2 == high)
+        if (G_BIN2)
             P2OUT |=  BIN2;
         else
             P2OUT &= ~BIN2;
     } else {
         // Stepper motor mode
         // Change from DC motor to indexer mode
-        if (G_BYPASS_INDEXER_OLD == true) {
+        if (G_BYPASS_INDEXER_OLD) {
             // Reset state machine
             G_SPEED_PROFILE         = false;
             G_STEP_PROFILE          = false;
@@ -371,7 +371,7 @@ UpdateGPIO ()
         }
 
         // STEP_AIN1 (send 1 step)
-        if (G_STEP_AIN1 == high) {
+        if (G_STEP_AIN1) {
             // Set the timer output low
             TA1CCTL1 =  OUTMOD_0;
             P2OUT   &= ~STEP_AIN1;
@@ -395,7 +395,7 @@ UpdateGPIO ()
         }
 
         // DIR_AIN2
-        if (G_DIR_AIN2 == high)
+        if (G_DIR_AIN2)
             P2OUT |=  DIR_AIN2;
         else
             P2OUT &= ~DIR_AIN2;
@@ -418,19 +418,19 @@ void
 UpdateDRV8711Registers ()
 {
     // Write all registers
-    if (G_WRITE_ALL_REG == true) {
+    if (G_WRITE_ALL_REG) {
         WriteAllRegisters ();
         G_WRITE_ALL_REG = false;
     }
 
     // Read all registers
-    if (G_READ_ALL_REG == true) {
+    if (G_READ_ALL_REG) {
         ReadAllRegisters ();
         G_READ_ALL_REG = false;
     }
 
     // Reset FAULTS
-    if (G_RESET_FAULTS == true) {
+    if (G_RESET_FAULTS) {
         SPI_DRV8711_ReadWrite (0x70, 0x00);
         G_STATUS_REG.STDLAT = 0x00;
         G_STATUS_REG.STD    = 0x00;
@@ -444,7 +444,7 @@ UpdateDRV8711Registers ()
     }
 
     // Manual SPI write
-    if (G_MANUAL_WRITE == true) {
+    if (G_MANUAL_WRITE) {
         unsigned char byteHi = REGWRITE | (G_WRITE_ADDR << 4) |
                                (G_WRITE_DATA >> 8);
         unsigned char byteLo = G_WRITE_DATA;
@@ -453,7 +453,7 @@ UpdateDRV8711Registers ()
     }
 
     // Manual SPI read
-    if (G_MANUAL_READ == true) {
+    if (G_MANUAL_READ) {
         unsigned char byte = REGREAD | (G_READ_ADDR << 4);
         G_READ_DATA = SPI_DRV8711_ReadWrite (byte, 0x00) & 0x0FFF;
         G_MANUAL_READ = false;
@@ -596,7 +596,7 @@ UpdateFullScaleCurrent ()
         (G_TORQUE_REG.TORQUE != G_TORQUE_OLD)) {
         // Parse ISGAIN
         unsigned int temp_isgain;
-        if (G_CTRL_REG.ISGAIN == 0)
+        if (G_CTRL_REG.ISGAIN == 0)                 // TODO Replace with switch
             temp_isgain = 5;
         else if (G_CTRL_REG.ISGAIN == 1)
             temp_isgain = 10;
@@ -618,63 +618,52 @@ UpdateFullScaleCurrent ()
 void
 UpdateStepperMotionProfile ()
 {
-    if (G_BYPASS_INDEXER == false) {
+    if (!G_BYPASS_INDEXER) {
         // Motion profile state machine
-        // Speed profile motor start
-        if ((G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == false)) {
+        if (G_SPEED_PROFILE && !G_SPEED_PROFILE_LOCK) {
+            // Speed profile motor start
             G_MOTOR_STATE = SPD_START;
-        }
-        // Speed profile motor accelerating
-        else if ((G_CUR_SPEED < G_TARGET_SPEED) &&
-                 (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_SPEED < G_TARGET_SPEED) &&
+                   G_SPEED_PROFILE && G_SPEED_PROFILE_LOCK) {
+            // Speed profile motor accelerating
             G_MOTOR_STATE = SPD_ACCEL;
-        }
-        // Speed profile motor stable
-        else if ((G_CUR_SPEED == G_TARGET_SPEED) &&
-                 (G_SPEED_PROFILE == true) && (G_SPEED_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_SPEED == G_TARGET_SPEED) &&
+                   G_SPEED_PROFILE && G_SPEED_PROFILE_LOCK) {
+            // Speed profile motor stable
             G_MOTOR_STATE = SPD_STABLE;
-        }
-        // Speed profile motor decelerating
-        else if ((G_CUR_SPEED > G_START_STOP_SPEED) &&
-                 (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_SPEED > G_START_STOP_SPEED) &&
+                   !G_SPEED_PROFILE && G_SPEED_PROFILE_LOCK) {
+            // Speed profile motor decelerating
             G_MOTOR_STATE = SPD_DECEL;
-        }
-        // Speed profile motor stop
-        else if ((G_CUR_SPEED == G_START_STOP_SPEED) &&
-                 (G_SPEED_PROFILE == false) && (G_SPEED_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_SPEED == G_START_STOP_SPEED) &&
+                   !G_SPEED_PROFILE && G_SPEED_PROFILE_LOCK) {
+            // Speed profile motor stop
             G_MOTOR_STATE = SPD_STOP;
-        }
-        // Step profile motor start
-        else if ((G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == false)) {
+        } else if (G_STEP_PROFILE && !G_STEP_PROFILE_LOCK) {
+            // Step profile motor start
             G_MOTOR_STATE = STP_START;
-        }
-        // Step profile motor accelerating
-        else if ((G_CUR_NUM_STEPS < G_STEPS_TO_ACCEL) &&
-                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_NUM_STEPS < G_STEPS_TO_ACCEL) &&
+                   G_STEP_PROFILE && G_STEP_PROFILE_LOCK) {
+            // Step profile motor accelerating
             G_MOTOR_STATE = STP_ACCEL;
-        }
-        // Step profile motor stable
-        else if ((G_CUR_NUM_STEPS < (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
-                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_NUM_STEPS < (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
+                   G_STEP_PROFILE && G_STEP_PROFILE_LOCK) {
+            // Step profile motor stable
             G_MOTOR_STATE = STP_STABLE;
-        }
-        // Step profile motor decelerating
-        else if ((G_CUR_NUM_STEPS >= (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
-                 (G_CUR_NUM_STEPS < G_TOTAL_NUM_STEPS) &&
-                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_NUM_STEPS >= (G_TOTAL_NUM_STEPS - G_STEPS_TO_ACCEL)) &&
+                   (G_CUR_NUM_STEPS < G_TOTAL_NUM_STEPS) &&
+                   G_STEP_PROFILE && G_STEP_PROFILE_LOCK) {
+            // Step profile motor decelerating
             G_MOTOR_STATE = STP_DECEL;
-        }
-        // Step profile motor stop
-        else if ((G_CUR_NUM_STEPS >= G_TOTAL_NUM_STEPS) &&
-                 (G_STEP_PROFILE == true) && (G_STEP_PROFILE_LOCK == true)) {
+        } else if ((G_CUR_NUM_STEPS >= G_TOTAL_NUM_STEPS) &&
+                   G_STEP_PROFILE && G_STEP_PROFILE_LOCK) {
+            // Step profile motor stop
             G_MOTOR_STATE = STP_STOP;
-        }
-        // Step profile force motor stop
-        else if ((G_STEP_PROFILE == false) && (G_STEP_PROFILE_LOCK == true)) {
+        } else if (!G_STEP_PROFILE && G_STEP_PROFILE_LOCK) {
+            // Step profile force motor stop
             G_MOTOR_STATE = STP_STOP;
-        }
-        // Motor hold
-        else {
+        } else {
+            // Motor hold
             G_MOTOR_STATE = HOLD;
         }
 
@@ -686,10 +675,10 @@ UpdateStepperMotionProfile ()
 }
 
 void
-SpeedProfile ()
+SpeedProfile ()     // TODO Replace ifs with a switch
 {
-    // Motor start
     if (G_MOTOR_STATE == SPD_START) {
+        // Motor start
         G_SPEED_PROFILE_LOCK = true;
         // Set the start speed (cannot overflow the timer register)
         G_CUR_NUM_STEPS = 0;
@@ -697,6 +686,7 @@ SpeedProfile ()
         if (G_START_STOP_SPEED > G_TARGET_SPEED)
             G_START_STOP_SPEED = G_TARGET_SPEED;
         G_CUR_SPEED = G_START_STOP_SPEED;
+        // TODO Replace hard-coded numbers
         TA1CCR0 = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
@@ -719,53 +709,49 @@ SpeedProfile ()
         // Setup watchdog timer as an interval timer for accel/decel updates
         WDTCTL   =  WDT_MDLY_32;
         IE1     |=  WDTIE;
-    }
-
-    // Motor accelerate
-    else if ((G_MOTOR_STATE == SPD_ACCEL) && (G_ACCEL_FLAG == true)) {
+    } else if ((G_MOTOR_STATE == SPD_ACCEL) && (G_ACCEL_FLAG == true)) {
+        // Motor accelerate
         G_ACCEL_FLAG = false;
-        // Increase speed
         if ((G_CUR_SPEED + G_SPEED_INCR) < G_TARGET_SPEED) {
+            // Increase speed
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED + G_SPEED_INCR;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
-        }
-        // Load target speed
-        else {
+        } else {
+            // Load target speed
             // Calcute target speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_TARGET_SPEED;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_TARGET_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_TARGET_SPEED) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-    }
-
-    // Motor decelerate
-    else if ((G_MOTOR_STATE == SPD_DECEL) && (G_ACCEL_FLAG == true)) {
+    } else if ((G_MOTOR_STATE == SPD_DECEL) && (G_ACCEL_FLAG == true)) {
+        // Motor decelerate
         G_ACCEL_FLAG = false;
-        // Decrease speed
         if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) &&
             (G_CUR_SPEED > G_SPEED_INCR)) {
+            // Decrease speed
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
-        }
-        // Load stop speed
-        else {
+        } else {
+            // Load stop speed
             // Calcute stop speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_START_STOP_SPEED;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-    }
-
-    // Motor stop
-    else if (G_MOTOR_STATE == SPD_STOP) {
+    } else if (G_MOTOR_STATE == SPD_STOP) {
+        // Motor stop
         // Stop watchdog interval timer
         WDTCTL =  WDTPW | WDTHOLD;
         IE1   &= ~WDTIE;
@@ -773,17 +759,14 @@ SpeedProfile ()
         TA1CTL =  TASSEL_2 | MC_0 | TACLR;
         G_CUR_SPEED = 0;
         G_SPEED_PROFILE_LOCK = false;
-    }
-
-    // Catch all
-    else {}
+    } else {} // Catch all
 }
 
 void
 StepProfile ()
 {
-    // Motor start
     if (G_MOTOR_STATE == STP_START) {
+        // Motor start
         G_STEP_PROFILE_LOCK = true;
         // Set the start speed (cannot overflow the timer register)
         G_CUR_NUM_STEPS = 0;
@@ -791,6 +774,7 @@ StepProfile ()
         if (G_START_STOP_SPEED > G_TARGET_SPEED)
             G_START_STOP_SPEED = G_TARGET_SPEED;
         G_CUR_SPEED = G_START_STOP_SPEED;
+        // TODO Replace hard-coded numbers
         TA1CCR0 = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
         TA1CCR1 = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
 
@@ -822,53 +806,49 @@ StepProfile ()
         // Setup watchdog timer as an interval timer for accel/decel updates
         WDTCTL   =  WDT_MDLY_32;
         IE1     |=  WDTIE;
-    }
-
-    // Motor accelerate
-    else if ((G_MOTOR_STATE == STP_ACCEL) && (G_ACCEL_FLAG == true)) {
+    } else if ((G_MOTOR_STATE == STP_ACCEL) && G_ACCEL_FLAG) {
+        // Motor accelerate
         G_ACCEL_FLAG = false;
-        // Increase speed
         if ((G_CUR_SPEED + G_SPEED_INCR) < G_TARGET_SPEED) {
+            // Increase speed
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED + G_SPEED_INCR;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
-        }
-        // Load target speed
-        else {
+        } else {
+            // Load target speed
             // Calcute target speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_TARGET_SPEED;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_TARGET_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_TARGET_SPEED) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-    }
-
-    // Motor decelerate
-    else if ((G_MOTOR_STATE == STP_DECEL) && (G_ACCEL_FLAG == true)) {
+    } else if ((G_MOTOR_STATE == STP_DECEL) && G_ACCEL_FLAG) {
+        // Motor decelerate
         G_ACCEL_FLAG = false;
         // Decrease speed
         if (((G_CUR_SPEED - G_SPEED_INCR) > G_START_STOP_SPEED) &&
             (G_CUR_SPEED > G_SPEED_INCR)) {
             // Calcute next speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_CUR_SPEED - G_SPEED_INCR;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_CUR_SPEED_TEMP) >> 1;
             G_LOAD_CCR_VALS = true;
-        }
-        // Load stop speed
-        else {
+        } else {
+            // Load stop speed
             // Calcute stop speed value (cannot overflow the timer register)
             G_CUR_SPEED_TEMP = G_START_STOP_SPEED;
+            // TODO Replace hard-coded numbers
             G_TA1CCR0_TEMP = (SMCLK_MHz*1000000)/G_START_STOP_SPEED;
             G_TA1CCR1_TEMP = ((SMCLK_MHz*1000000)/G_START_STOP_SPEED) >> 1;
             G_LOAD_CCR_VALS = true;
         }
-    }
-
-    // Motor stop
-    else if (G_MOTOR_STATE == STP_STOP) {
+    } else if (G_MOTOR_STATE == STP_STOP) {
+        // Motor stop
         // Stop watchdog interval timer
         WDTCTL =  WDTPW | WDTHOLD;
         IE1   &= ~WDTIE;
@@ -878,10 +858,7 @@ StepProfile ()
         G_CUR_SPEED = 0;
         G_STEP_PROFILE = false;
         G_STEP_PROFILE_LOCK = false;
-    }
-
-    // Catch all
-    else {}
+    } else {} // Catch all
 }
 
 unsigned int

@@ -88,7 +88,7 @@ __interrupt void
 Timer1_A0 (void)
 {
     // Update timer at end of PWM period
-    if (G_LOAD_CCR_VALS == true) {
+    if (G_LOAD_CCR_VALS) {
         G_CUR_SPEED = G_CUR_SPEED_TEMP;
         TA1CCR0 = G_TA1CCR0_TEMP;
         TA1CCR1 = G_TA1CCR1_TEMP;
