@@ -149,7 +149,7 @@ unsigned char
 *GetInCmdAddress ()
 {
     unsigned char *addr         = 0;
-    unsigned long  addr_value   = 0;
+    unsigned long  addr_value   = 0;    // TODO Declare as static
     int addressSize = 4; // Always use 32bit address
     for (int i = 0; i < addressSize; i++) {
         addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
@@ -237,6 +237,7 @@ MemAccessCmd (int RW)
 
     MAUsToRead = GetTransferSizeInMAU ();
     for (unsigned short i = 0; i < MAUsToRead; i++) {
+        // TODO Replace with switch
         if (RW == READ) {
             dataChar = *(addr + i);
             WriteMAUToCOM (dataChar);
