@@ -251,6 +251,7 @@ MemAccessCmd (int RW)
 int
 ProcessCommand ()
 {
+    // TODO Remove redundant checks
     if (VerifyInputCmdHeaders ())
         return 1;
 
