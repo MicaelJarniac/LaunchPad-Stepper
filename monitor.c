@@ -146,10 +146,10 @@ GetRWFlag () // Equivalent to endianness on the MAU in transmission
 }
 
 unsigned char
-*GetInCmdAddress ()
+*GetInCmdAddress () // Returns a pointer to internal memory
 {
     unsigned char *addr         = 0;
-    unsigned long  addr_value   = 0;    // TODO Declare as static
+    unsigned long  addr_value   = 0;    // TODO Declare as static or not
     int addressSize = 4; // Always use 32bit address
     for (int i = 0; i < addressSize; i++) {
         addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
