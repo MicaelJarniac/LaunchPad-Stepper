@@ -167,18 +167,20 @@ MemAccessCmd (int RW)
     unsigned char   dataChar    = 0;
     unsigned char  *addr        = GetInCmdAddress ();
 
-    for (unsigned short j = 0; j < 1; j++)
-        WriteByteToCOM (gInCmdBuffer[j]);
+    WriteByteToCOM (gInCmdBuffer[0]);
 
     MAUsToRead = GetTransferSize ();
     for (unsigned short i = 0; i < MAUsToRead; i++) {
-        // TODO Replace with switch
-        if (RW == READ) {
+        switch (RW) {
+        case READ:
             dataChar = *(addr + i);
             WriteMAUToCOM (dataChar);
-        } else { // WRITE
+            break;
+        case WRITE:
+        default:
             dataChar = GetWriteCmdDataMAU (i);
             *(addr + i) = dataChar;
+            break;
         }
     }
 }
@@ -186,10 +188,6 @@ MemAccessCmd (int RW)
 int
 ProcessCommand ()
 {
-    // TODO Remove redundant checks
-    if (VerifyInputCmdHeaders ())
-        return 1;
-
     switch (GetInputCmdType ()) {
     case RW_CMD:
         MemAccessCmd (GetRWFlag ());
