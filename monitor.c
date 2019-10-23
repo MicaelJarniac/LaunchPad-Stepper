@@ -39,20 +39,16 @@
 
 #include "uart.h"
 #include "monitor.h"
+#include "utility.h"
 
 #define RW_CMD              0x80
+#define TRANSFER_SIZE_MASK  0x3f
 
-#define EXTENSION_BYTE      0x07
+#define ADDR_SIZE           2
 
 // RW CMD TYPE
 #define READ                1
 #define WRITE               0
-// ENDIANNESS
-#define BIG_ENDIAN          1
-#define LITTLE_ENDIAN       0
-// ADDRESSIBLE SIZE
-#define ADDRESSIBLE_32_BIT  1
-#define ADDRESSIBLE_16_BIT  0
 // Override these depends on target:
 // CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
 #define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
@@ -64,32 +60,10 @@ volatile unsigned short gInCmdSkipCount;
 void ClearBufferRelatedParam ();
 
 // Override these depends on target
-int
-GetTargetEndianness ()
-{
-    return LITTLE_ENDIAN;
-}
-// Override these depends on target
 void
-Write8bitByteToCOM (unsigned char c)
+WriteByteToCOM (unsigned char c)
 {
     uartTxByte (c & 0xff);
-}
-
-int
-GetSizeOfMAUIn8bitByte ()
-{
-    unsigned char maxMAUValue = (unsigned char)(-1);
-    switch (maxMAUValue) {
-    case 0xff:
-        return 1;
-
-    case 0xffff:
-        return 2;
-
-    default:
-        return 0;
-    }
 }
 
 int
@@ -119,23 +93,23 @@ WriteByteToInCmdBuffer (unsigned char d)
 }
 
 int
-GetTransferSizeInMAU () // Transfer size refer to the words to read/write of a
+GetTransferSize () // Transfer size refer to the words to read/write of a
                         // given cmd, not the number of bytes for the whole cmd
                         // packet
 {
-    return (gInCmdBuffer[0] & 0x3f);
+    return (gInCmdBuffer[0] & TRANSFER_SIZE_MASK);
 }
 
 int
 VerifyInputCmdHeaders ()
 {
-    return ((gInCmdBuffer[0] & 0x80) == 0x80) ? 0 : 1;
+    return ((gInCmdBuffer[0] & RW_CMD) == RW_CMD) ? 0 : 1;
 }
 
 int
 GetInputCmdType ()
 {
-    return (gInCmdBuffer[0] & 0x80);
+    return (gInCmdBuffer[0] & RW_CMD);
 }
 
 int
@@ -150,7 +124,7 @@ unsigned char
 {
     unsigned char *addr         = 0;
     unsigned long  addr_value   = 0;
-    int addressSize = 4; // Always use 32bit address
+    int addressSize = ADDR_SIZE; // Always use 32bit address
     for (int i = 0; i < addressSize; i++) {
         addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
                                       (addressSize - 1 - i)); // Big endian
@@ -163,29 +137,7 @@ unsigned char
 void
 WriteMAUToCOM (unsigned char d)
 {
-    int MAUSize = GetSizeOfMAUIn8bitByte ();
-
-    switch (MAUSize) {
-    case 1:
-        Write8bitByteToCOM (d);
-        break;
-
-    case 2:
-        unsigned char MAU[2];
-        MAU[0] = (unsigned char)(d & 0xff);
-        MAU[1] = (unsigned char)(d >> 8);
-        if (GetTargetEndianness () == LITTLE_ENDIAN) {
-            Write8bitByteToCOM (MAU[0]);
-            Write8bitByteToCOM (MAU[1]);
-        } else {
-            Write8bitByteToCOM (MAU[1]);
-            Write8bitByteToCOM (MAU[0]);
-        }
-        break;
-
-    default: // Only handles 8bit, 16bit MAU
-        break;
-    }
+    WriteByteToCOM (d);
 }
 
 unsigned char
@@ -194,26 +146,9 @@ GetWriteCmdDataMAU (int idx)
     unsigned char startIdx  = 1 + 4;
 
     unsigned char val       = 0;
-    int MAUSize = GetSizeOfMAUIn8bitByte ();
-    int byteOffset = idx*MAUSize;
+    int byteOffset = idx;
 
-    switch (MAUSize) {
-    case 1:
-        val = gInCmdBuffer[startIdx + byteOffset];
-        break;
-
-    case 2:
-        if (GetTargetEndianness () == LITTLE_ENDIAN)
-            val = (gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) |
-                  gInCmdBuffer[startIdx + byteOffset];
-        else
-            val = (gInCmdBuffer[startIdx + byteOffset] |
-                   gInCmdBuffer[startIdx + byteOffset + 1] << 8);
-        break;
-
-    default: // Only handles 8bit, 16bit MAU
-        break;
-    }
+    val = gInCmdBuffer[startIdx + byteOffset];
 
     return val;
 }
@@ -233,9 +168,9 @@ MemAccessCmd (int RW)
     unsigned char  *addr        = GetInCmdAddress ();
 
     for (unsigned short j = 0; j < 1; j++)
-        Write8bitByteToCOM (gInCmdBuffer[j]);
+        WriteByteToCOM (gInCmdBuffer[j]);
 
-    MAUsToRead = GetTransferSizeInMAU ();
+    MAUsToRead = GetTransferSize ();
     for (unsigned short i = 0; i < MAUsToRead; i++) {
         // TODO Replace with switch
         if (RW == READ) {
@@ -287,8 +222,7 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
 
         if (gInCmdBufferIdx == 1) {
             if (GetRWFlag () == WRITE) {
-                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () *
-                                  GetSizeOfMAUIn8bitByte ();
+                gInCmdSkipCount = 4 - 1 + GetTransferSize ()
             } else
                 gInCmdSkipCount = 4 - 1;
         } else {
