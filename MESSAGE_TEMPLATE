@@ -1,0 +1,34 @@
+RW_CMD                  0x80
+TRANSFER_SIZE_MASK      0x3f
+ADDR_SIZE               2
+
+IDX             1       0
+0       0       RW_CMD  invalid
+        0       READ    WRITE
+        0       / TRANSFER_SIZE
+        0       |
+                |
+        0       |
+        0       |
+        0       |
+        0       \
+--------
+1       0       / ADDRESS
+        0       |
+        0       |
+        0       |
+                |
+        0       |
+        0       |
+        0       |
+        0       |
+--------        |
+2       0       |
+        0       |
+        0       |
+        0       |
+                |
+        0       |
+        0       |
+        0       |
+        0       \
