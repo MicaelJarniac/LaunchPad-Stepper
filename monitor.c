@@ -213,8 +213,8 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
         return;
     }
 
-    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) { // Wrong input header,
-                                                       // clear cmd buffer
+    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) {
+        // Wrong input header, clear cmd buffer
         if (VerifyInputCmdHeaders ()) {
             ClearBufferRelatedParam ();
             return;
