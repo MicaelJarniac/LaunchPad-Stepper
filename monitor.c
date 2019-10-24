@@ -43,6 +43,7 @@
 
 #define RW_CMD              0x80
 #define TRANSFER_SIZE_MASK  0x3f
+#define BYTE_MASK           0xff
 
 #define ADDR_SIZE           2
 
@@ -50,6 +51,7 @@
 #define READ                1
 #define WRITE               0
 // Override these depends on target:
+// TODO Replace hard-coded number
 // CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
 #define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
 
@@ -63,7 +65,7 @@ void ClearBufferRelatedParam ();
 void
 WriteByteToCOM (unsigned char c)
 {
-    uartTxByte (c & 0xff);
+    uartTxByte (c & BYTE_MASK);
 }
 
 int
@@ -72,7 +74,7 @@ WriteToCmdBuffer (unsigned char  *buf,
                   unsigned char   d)
 {
     if ((*bufIdx) < CMD_BUFFER_SIZE) {
-        buf[*bufIdx] = d & 0xff;
+        buf[*bufIdx] = d & BYTE_MASK;
         (*bufIdx)++;
         return 0;
     }
@@ -107,30 +109,21 @@ VerifyInputCmdHeaders ()
 }
 
 int
-GetInputCmdType ()
-{
-    return (gInCmdBuffer[0] & RW_CMD);
-}
-
-int
 GetRWFlag () // Equivalent to endianness on the MAU in transmission
 {
-    int ret = ((gInCmdBuffer[0] >> 6) & 0x1);
-    return ret;
+    return ((gInCmdBuffer[0] >> 6) & 0x1);
 }
 
 unsigned char
-*GetInCmdAddress () // Returns a pointer to internal memory
+GetInCmdAddress () // Returns a pointer to internal memory
 {
-    unsigned char *addr         = 0;
-    unsigned long  addr_value   = 0;
+    unsigned char addr = 0;
     int addressSize = ADDR_SIZE; // Always use 32bit address
-    for (int i = 0; i < addressSize; i++) {
-        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
-                                      (addressSize - 1 - i)); // Big endian
+    for (int i = 1; i <= addressSize; i++) {
+        addr |= (unsigned long)(gInCmdBuffer[i] << 8 *
+                                (addressSize - i)); // Big endian
     }
 
-    addr = (unsigned char*) addr_value;
     return addr;
 }
 
@@ -143,10 +136,10 @@ WriteMAUToCOM (unsigned char d)
 unsigned char
 GetWriteCmdDataMAU (int idx)
 {
-    unsigned char startIdx  = 1 + 4;
+    unsigned char startIdx  = 1 + ADDR_SIZE;
 
     unsigned char val       = 0;
-    int byteOffset = idx;
+    int byteOffset          = idx;
 
     val = gInCmdBuffer[startIdx + byteOffset];
 
@@ -157,7 +150,7 @@ void
 ClearBufferRelatedParam ()
 {
     gInCmdSkipCount = 0;
-    gInCmdBufferIdx = 0;
+    ResetInCmdBuffer ();
 }
 
 void
@@ -165,14 +158,14 @@ MemAccessCmd (int RW)
 {
     unsigned short  MAUsToRead  = 0;
     unsigned char   dataChar    = 0;
-    unsigned char  *addr        = GetInCmdAddress ();
+    unsigned char   addr        = GetInCmdAddress ();
 
     WriteByteToCOM (gInCmdBuffer[0]);
 
     MAUsToRead = GetTransferSize ();
     for (unsigned short i = 0; i < MAUsToRead; i++) {
         switch (RW) {
-        case READ:
+        case READ:          // TODO Modify here to assign variables
             dataChar = *(addr + i);
             WriteMAUToCOM (dataChar);
             break;
@@ -188,14 +181,10 @@ MemAccessCmd (int RW)
 int
 ProcessCommand ()
 {
-    switch (GetInputCmdType ()) {
-    case RW_CMD:
-        MemAccessCmd (GetRWFlag ());
-        break;
-
-    default:
+    if (VerifyInputCmdHeaders ())
         return 1;
-    }
+    else
+        MemAccessCmd (GetRWFlag ());
 
     return 0;
 }
@@ -219,10 +208,10 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
         }
 
         if (gInCmdBufferIdx == 1) {
-            if (GetRWFlag () == WRITE) {
-                gInCmdSkipCount = 4 - 1 + GetTransferSize ()
-            } else
-                gInCmdSkipCount = 4 - 1;
+            if (GetRWFlag () == WRITE)
+                gInCmdSkipCount = ADDR_SIZE - 1 + GetTransferSize ();
+            else
+                gInCmdSkipCount = ADDR_SIZE - 1;
         } else {
             ProcessCommand ();
             ClearBufferRelatedParam ();
