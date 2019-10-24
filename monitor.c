@@ -44,6 +44,7 @@
 #define RW_CMD              0x80
 #define TRANSFER_SIZE_MASK  0x3f
 #define BYTE_MASK           0xff
+#define RW_MASK             0x40
 
 #define ADDR_SIZE           2
 
@@ -82,12 +83,6 @@ WriteToCmdBuffer (unsigned char  *buf,
     return 1;
 }
 
-void
-ResetInCmdBuffer ()
-{
-    gInCmdBufferIdx = 0;
-}
-
 int
 WriteByteToInCmdBuffer (unsigned char d)
 {
@@ -96,8 +91,8 @@ WriteByteToInCmdBuffer (unsigned char d)
 
 int
 GetTransferSize () // Transfer size refer to the words to read/write of a
-                        // given cmd, not the number of bytes for the whole cmd
-                        // packet
+                   // given cmd, not the number of bytes for the whole cmd
+                   // packet
 {
     return (gInCmdBuffer[0] & TRANSFER_SIZE_MASK);
 }
@@ -111,9 +106,10 @@ VerifyInputCmdHeaders ()
 int
 GetRWFlag () // Equivalent to endianness on the MAU in transmission
 {
-    return ((gInCmdBuffer[0] >> 6) & 0x1);
+    return ((gInCmdBuffer[0] & RW_MASK) == RW_MASK) ? 1 : 0;
 }
 
+// TODO Replace with shorter addresses
 unsigned char
 GetInCmdAddress () // Returns a pointer to internal memory
 {
@@ -125,12 +121,6 @@ GetInCmdAddress () // Returns a pointer to internal memory
     }
 
     return addr;
-}
-
-void
-WriteMAUToCOM (unsigned char d)
-{
-    WriteByteToCOM (d);
 }
 
 unsigned char
@@ -150,7 +140,7 @@ void
 ClearBufferRelatedParam ()
 {
     gInCmdSkipCount = 0;
-    ResetInCmdBuffer ();
+    gInCmdBufferIdx = 0;
 }
 
 void
@@ -167,7 +157,7 @@ MemAccessCmd (int RW)
         switch (RW) {
         case READ:          // TODO Modify here to assign variables
             dataChar = *(addr + i);
-            WriteMAUToCOM (dataChar);
+            WriteByteToCOM (dataChar);
             break;
         case WRITE:
         default:
