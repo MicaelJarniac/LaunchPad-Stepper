@@ -118,12 +118,7 @@ GetWriteCmdDataMAU (int idx)
 {
     unsigned char startIdx  = 2;
 
-    unsigned char val       = 0;
-    int byteOffset          = idx;
-
-    val = gInCmdBuffer[startIdx + byteOffset];
-
-    return val;
+    return gInCmdBuffer[startIdx + idx];
 }
 
 void
