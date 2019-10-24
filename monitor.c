@@ -46,8 +46,6 @@
 #define BYTE_MASK           0xff
 #define RW_MASK             0x40
 
-#define ADDR_SIZE           2
-
 // RW CMD TYPE
 #define READ                1
 #define WRITE               0
@@ -109,24 +107,16 @@ GetRWFlag () // Equivalent to endianness on the MAU in transmission
     return ((gInCmdBuffer[0] & RW_MASK) == RW_MASK) ? 1 : 0;
 }
 
-// TODO Replace with shorter addresses
 unsigned char
-GetInCmdAddress () // Returns a pointer to internal memory
+GetInCmdAddress ()
 {
-    unsigned char addr = 0;
-    int addressSize = ADDR_SIZE; // Always use 32bit address
-    for (int i = 1; i <= addressSize; i++) {
-        addr |= (unsigned long)(gInCmdBuffer[i] << 8 *
-                                (addressSize - i)); // Big endian
-    }
-
-    return addr;
+    return gInCmdBuffer[1];
 }
 
 unsigned char
 GetWriteCmdDataMAU (int idx)
 {
-    unsigned char startIdx  = 1 + ADDR_SIZE;
+    unsigned char startIdx  = 2;
 
     unsigned char val       = 0;
     int byteOffset          = idx;
@@ -199,9 +189,9 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
 
         if (gInCmdBufferIdx == 1) {
             if (GetRWFlag () == WRITE)
-                gInCmdSkipCount = ADDR_SIZE - 1 + GetTransferSize ();
+                gInCmdSkipCount = GetTransferSize ();
             else
-                gInCmdSkipCount = ADDR_SIZE - 1;
+                gInCmdSkipCount = 0;
         } else {
             ProcessCommand ();
             ClearBufferRelatedParam ();
