@@ -61,9 +61,11 @@ volatile unsigned short gInCmdSkipCount;
 void ClearBufferRelatedParam ();
 
 void
-WriteVar (int            id,
-          unsigned char *data,
-          int            size) 
+WriteVar (int           id,
+          //unsigned char *data,
+          unsigned char data,
+          //int            size) 
+          int           offset) 
 {
     unsigned char *addr = 0;
 
@@ -167,18 +169,25 @@ WriteVar (int            id,
         break;
     }
 
+    // TODO Remove commented code
+    /*
     for (int i = 0; i < size; i++) {
         *(addr + i) = *(data + i);
     }
+    */
+
+    *(addr + offset) = data;
 }
 
 // TODO Merge WriteVar here, replace size with received variable
-unsigned double
-ReadVar (int id)
+//unsigned double
+unsigned char
+ReadVar (int id,
+         int offset)
 {
-    unsigned char  *addr = 0;
-    int             size = 0;
-    unsigned double data = 0;
+    unsigned char   *addr = 0;
+    int              size = 0;  // TODO Remove size
+    unsigned double  data = 0;
 
     switch (id) {
         // GUI variables
@@ -310,11 +319,16 @@ ReadVar (int id)
         break;
     }
 
+    // TODO Remove commented code
+    /*
     for (int i = 0; i < size; i++) {
         data |= *(addr + i) << (8 * (size - 1 - i));
     }
+    */
 
-    return data;
+    return *(addr + offset);
+
+    //return data;
 }
 
 // Override these depends on target
@@ -398,13 +412,15 @@ MemAccessCmd (int RW)
     for (unsigned short i = 0; i < MAUsToRead; i++) {
         switch (RW) {
         case READ:          // TODO Modify here to assign variables
-            dataChar = *(addr + i);
+            //dataChar = *(addr + i);
+            dataChar = ReadVar (addr, i);
             WriteByteToCOM (dataChar);
             break;
         case WRITE:
         default:
             dataChar = GetWriteCmdDataMAU (i);
-            *(addr + i) = dataChar;
+            //*(addr + i) = dataChar;
+            WriteVar (addr, dataChar, i);
             break;
         }
     }
