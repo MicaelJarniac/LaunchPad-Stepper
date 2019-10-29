@@ -62,15 +62,14 @@ void ClearBufferRelatedParam ();
 
 void
 WriteVar (int           id,
-          //unsigned char *data,
           unsigned char data,
-          //int            size) 
           int           offset) 
 {
     unsigned char *addr = 0;
 
     switch (id) {
-        // GUI variables
+
+    // GUI variables
     case 1:
         addr = &G_FIRMWARE_VERSION;
         break;
@@ -117,7 +116,7 @@ WriteVar (int           id,
         addr = &G_READ_DATA;
         break;
 
-        // Stepper motion profile
+    // Stepper motion profile
     case 16:
         addr = &G_START_STOP_SPEED;
         break;
@@ -149,7 +148,7 @@ WriteVar (int           id,
         addr = &G_STEP_PROFILE_LOCK;
         break;
 
-        // Motor status
+    // Motor status
     case 26:
         addr = &G_CUR_NUM_STEPS;
         break;
@@ -169,18 +168,10 @@ WriteVar (int           id,
         break;
     }
 
-    // TODO Remove commented code
-    /*
-    for (int i = 0; i < size; i++) {
-        *(addr + i) = *(data + i);
-    }
-    */
-
     *(addr + offset) = data;
 }
 
-// TODO Merge WriteVar here, replace size with received variable
-//unsigned double
+// TODO Merge WriteVar here
 unsigned char
 ReadVar (int id,
          int offset)
@@ -190,7 +181,8 @@ ReadVar (int id,
     unsigned double  data = 0;
 
     switch (id) {
-        // GUI variables
+
+    // GUI variables
     case 1:
         addr = &G_FIRMWARE_VERSION;
         size = sizeof(G_FIRMWARE_VERSION);
@@ -252,7 +244,7 @@ ReadVar (int id,
         size = sizeof(G_READ_DATA);
         break;
 
-        // Stepper motion profile
+    // Stepper motion profile
     case 16:
         addr = &G_START_STOP_SPEED;
         size = sizeof(G_START_STOP_SPEED);
@@ -294,7 +286,7 @@ ReadVar (int id,
         size = sizeof(G_STEP_PROFILE_LOCK);
         break;
 
-        // Motor status
+    // Motor status
     case 26:
         addr = &G_CUR_NUM_STEPS;
         size = sizeof(G_CUR_NUM_STEPS);
@@ -315,6 +307,8 @@ ReadVar (int id,
         addr = &G_ACCEL_FLAG;
         size = sizeof(G_ACCEL_FLAG);
         break;
+
+    // DRV8711 GPIO
     case 31:
         addr = &G_nSLEEP;
         size = sizeof(G_nSLEEP);
@@ -351,16 +345,7 @@ ReadVar (int id,
         break;
     }
 
-    // TODO Remove commented code
-    /*
-    for (int i = 0; i < size; i++) {
-        data |= *(addr + i) << (8 * (size - 1 - i));
-    }
-    */
-
     return *(addr + offset);
-
-    //return data;
 }
 
 // Override these depends on target
