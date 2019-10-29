@@ -60,125 +60,13 @@ volatile unsigned short gInCmdSkipCount;
 
 void ClearBufferRelatedParam ();
 
-void
-WriteVar (int           id,
-          unsigned char data,
-          int           offset) 
-{
-    unsigned char *addr = 0;
-
-    switch (id) {
-
-    // GUI variables
-    case 1:
-        addr = &G_FIRMWARE_VERSION;
-        break;
-    case 2:
-        addr = &G_FULL_SCALE_CURRENT;
-        break;
-    case 3:
-        addr = &G_TORQUE_OLD;
-        break;
-    case 4:
-        addr = &G_ISGAIN_OLD;
-        break;
-    case 5:
-        addr = &G_BYPASS_INDEXER;
-        break;
-    case 6:
-        addr = &G_BYPASS_INDEXER_OLD;
-        break;
-    case 7:
-        addr = &G_WRITE_ALL_REG;
-        break;
-    case 8:
-        addr = &G_READ_ALL_REG;
-        break;
-    case 9:
-        addr = &G_RESET_FAULTS;
-        break;
-    case 10:
-        addr = &G_MANUAL_WRITE;
-        break;
-    case 11:
-        addr = &G_WRITE_ADDR;
-        break;
-    case 12:
-        addr = &G_WRITE_DATA;
-        break;
-    case 13:
-        addr = &G_MANUAL_READ;
-        break;
-    case 14:
-        addr = &G_READ_ADDR;
-        break;
-    case 15:
-        addr = &G_READ_DATA;
-        break;
-
-    // Stepper motion profile
-    case 16:
-        addr = &G_START_STOP_SPEED;
-        break;
-    case 17:
-        addr = &G_TARGET_SPEED;
-        break;
-    case 18:
-        addr = &G_ACCEL_RATE;
-        break;
-    case 19:
-        addr = &G_TOTAL_NUM_STEPS;
-        break;
-    case 20:
-        addr = &G_STEPS_TO_ACCEL;
-        break;
-    case 21:
-        addr = &G_MOTOR_STATE;
-        break;
-    case 22:
-        addr = &G_SPEED_PROFILE;
-        break;
-    case 23:
-        addr = &G_SPEED_PROFILE_LOCK;
-        break;
-    case 24:
-        addr = &G_STEP_PROFILE;
-        break;
-    case 25:
-        addr = &G_STEP_PROFILE_LOCK;
-        break;
-
-    // Motor status
-    case 26:
-        addr = &G_CUR_NUM_STEPS;
-        break;
-    case 27:
-        addr = &G_CUR_SPEED;
-        break;
-    case 28:
-        addr = &G_CUR_SPEED_TEMP;
-        break;
-    case 29:
-        addr = &G_SPEED_INCR;
-        break;
-    case 30:
-        addr = &G_ACCEL_FLAG;
-        break;
-    default:
-        break;
-    }
-
-    *(addr + offset) = data;
-}
-
-// TODO Merge WriteVar here
 unsigned char
-ReadVar (int id,
-         int offset)
+*VarAddr (int  id,
+          int  offset,
+          bool returnSize)
 {
-    unsigned char   *addr = 0;
-    int              size = 0;  // TODO Remove size
-    unsigned double  data = 0;
+    unsigned char        *addr = 0;
+    static unsigned char  size = 0;
 
     switch (id) {
 
@@ -342,10 +230,30 @@ ReadVar (int id,
         size = sizeof(G_nSTALL);
         break;
     default:
-        break;
+        return;
     }
 
-    return *(addr + offset);
+    if (returnSize)
+        return &size;
+    else
+        return (addr + offset);
+}
+
+void
+WriteVar (int           id,
+          int           offset,
+          unsigned char data)
+{
+    unsigned char *addr = VarAddr (id, offset, false);
+
+    *addr = data;
+}
+
+unsigned char
+ReadVar (int id,
+         int offset)
+{
+    return *VarAddr (id, offset, false);
 }
 
 // Override these depends on target
@@ -437,7 +345,7 @@ MemAccessCmd (int RW)
         default:
             dataChar = GetWriteCmdDataMAU (i);
             //*(addr + i) = dataChar;
-            WriteVar (addr, dataChar, i);
+            WriteVar (addr, i, dataChar);
             break;
         }
     }
