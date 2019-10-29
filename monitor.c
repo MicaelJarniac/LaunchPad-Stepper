@@ -315,6 +315,38 @@ ReadVar (int id,
         addr = &G_ACCEL_FLAG;
         size = sizeof(G_ACCEL_FLAG);
         break;
+    case 31:
+        addr = &G_nSLEEP;
+        size = sizeof(G_nSLEEP);
+        break;
+    case 32:
+        addr = &G_RESET;
+        size = sizeof(G_RESET);
+        break;
+    case 33:
+        addr = &G_STEP_AIN1;
+        size = sizeof(G_STEP_AIN1);
+        break;
+    case 34:
+        addr = &G_DIR_AIN2;
+        size = sizeof(G_DIR_AIN2);
+        break;
+    case 35:
+        addr = &G_BIN2;
+        size = sizeof(G_BIN2);
+        break;
+    case 36:
+        addr = &G_BIN1;
+        size = sizeof(G_BIN1);
+        break;
+    case 37:
+        addr = &G_nFAULT;
+        size = sizeof(G_nFAULT);
+        break;
+    case 38:
+        addr = &G_nSTALL;
+        size = sizeof(G_nSTALL);
+        break;
     default:
         break;
     }
