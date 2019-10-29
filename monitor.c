@@ -51,8 +51,8 @@
 #define WRITE               0
 // Override these depends on target:
 // TODO Replace hard-coded number
-// CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
-#define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
+// CMD_BUFFER_SIZE =  2 + sizeOfMauIn8BitByte * 63
+#define CMD_BUFFER_SIZE     65 // 1 + 1 + 63 = 65
 
 unsigned char           gInCmdBuffer[CMD_BUFFER_SIZE];
 unsigned short          gInCmdBufferIdx = 0;
@@ -303,7 +303,7 @@ GetRWFlag () // Equivalent to endianness on the MAU in transmission
     return ((gInCmdBuffer[0] & RW_MASK) == RW_MASK) ? 1 : 0;
 }
 
-unsigned char
+int
 GetInCmdAddress ()
 {
     return gInCmdBuffer[1];
@@ -329,12 +329,14 @@ MemAccessCmd (int RW)
 {
     unsigned short  MAUsToRead  = 0;
     unsigned char   dataChar    = 0;
-    unsigned char   addr        = GetInCmdAddress ();
+    int             addr        = GetInCmdAddress ();
 
     WriteByteToCOM (gInCmdBuffer[0]);
 
     MAUsToRead = GetTransferSize ();
-    for (unsigned short i = 0; i < MAUsToRead; i++) {
+
+    int i;
+    for (i = 0; i < MAUsToRead; i++) {
         switch (RW) {
         case READ:          // TODO Modify here to assign variables
             //dataChar = *(addr + i);
