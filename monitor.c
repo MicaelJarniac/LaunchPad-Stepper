@@ -70,6 +70,7 @@ unsigned char
 
     switch (id) {
 
+    // TODO Cast variables to the appropriate pointer type
     // GUI variables
     case 1:
         addr = &G_FIRMWARE_VERSION;
