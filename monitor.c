@@ -63,7 +63,7 @@ void ClearBufferRelatedParam ();
 unsigned char
 *VarAddr (int  id,
           int  offset,
-          bool returnSize)
+          boolean returnSize)
 {
     unsigned char        *addr = 0;
     static unsigned char  size = 0;
