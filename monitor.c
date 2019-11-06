@@ -70,164 +70,163 @@ unsigned char
 
     switch (id) {
 
-    // TODO Cast variables to the appropriate pointer type
     // GUI variables
     case 1:
-        addr = &G_FIRMWARE_VERSION;
+        addr = (unsigned char *)&G_FIRMWARE_VERSION;
         size = sizeof(G_FIRMWARE_VERSION);
         break;
     case 2:
-        addr = &G_FULL_SCALE_CURRENT;
+        addr = (unsigned char *)&G_FULL_SCALE_CURRENT;
         size = sizeof(G_FULL_SCALE_CURRENT);
         break;
     case 3:
-        addr = &G_TORQUE_OLD;
+        addr = (unsigned char *)&G_TORQUE_OLD;
         size = sizeof(G_TORQUE_OLD);
         break;
     case 4:
-        addr = &G_ISGAIN_OLD;
+        addr = (unsigned char *)&G_ISGAIN_OLD;
         size = sizeof(G_ISGAIN_OLD);
         break;
     case 5:
-        addr = &G_BYPASS_INDEXER;
+        addr = (unsigned char *)&G_BYPASS_INDEXER;
         size = sizeof(G_BYPASS_INDEXER);
         break;
     case 6:
-        addr = &G_BYPASS_INDEXER_OLD;
+        addr = (unsigned char *)&G_BYPASS_INDEXER_OLD;
         size = sizeof(G_BYPASS_INDEXER_OLD);
         break;
     case 7:
-        addr = &G_WRITE_ALL_REG;
+        addr = (unsigned char *)&G_WRITE_ALL_REG;
         size = sizeof(G_WRITE_ALL_REG);
         break;
     case 8:
-        addr = &G_READ_ALL_REG;
+        addr = (unsigned char *)&G_READ_ALL_REG;
         size = sizeof(G_READ_ALL_REG);
         break;
     case 9:
-        addr = &G_RESET_FAULTS;
+        addr = (unsigned char *)&G_RESET_FAULTS;
         size = sizeof(G_RESET_FAULTS);
         break;
     case 10:
-        addr = &G_MANUAL_WRITE;
+        addr = (unsigned char *)&G_MANUAL_WRITE;
         size = sizeof(G_MANUAL_WRITE);
         break;
     case 11:
-        addr = &G_WRITE_ADDR;
+        addr = (unsigned char *)&G_WRITE_ADDR;
         size = sizeof(G_WRITE_ADDR);
         break;
     case 12:
-        addr = &G_WRITE_DATA;
+        addr = (unsigned char *)&G_WRITE_DATA;
         size = sizeof(G_WRITE_DATA);
         break;
     case 13:
-        addr = &G_MANUAL_READ;
+        addr = (unsigned char *)&G_MANUAL_READ;
         size = sizeof(G_MANUAL_READ);
         break;
     case 14:
-        addr = &G_READ_ADDR;
+        addr = (unsigned char *)&G_READ_ADDR;
         size = sizeof(G_READ_ADDR);
         break;
     case 15:
-        addr = &G_READ_DATA;
+        addr = (unsigned char *)&G_READ_DATA;
         size = sizeof(G_READ_DATA);
         break;
 
     // Stepper motion profile
     case 16:
-        addr = &G_START_STOP_SPEED;
+        addr = (unsigned char *)&G_START_STOP_SPEED;
         size = sizeof(G_START_STOP_SPEED);
         break;
     case 17:
-        addr = &G_TARGET_SPEED;
+        addr = (unsigned char *)&G_TARGET_SPEED;
         size = sizeof(G_TARGET_SPEED);
         break;
     case 18:
-        addr = &G_ACCEL_RATE;
+        addr = (unsigned char *)&G_ACCEL_RATE;
         size = sizeof(G_ACCEL_RATE);
         break;
     case 19:
-        addr = &G_TOTAL_NUM_STEPS;
+        addr = (unsigned char *)&G_TOTAL_NUM_STEPS;
         size = sizeof(G_TOTAL_NUM_STEPS);
         break;
     case 20:
-        addr = &G_STEPS_TO_ACCEL;
+        addr = (unsigned char *)&G_STEPS_TO_ACCEL;
         size = sizeof(G_STEPS_TO_ACCEL);
         break;
     case 21:
-        addr = &G_MOTOR_STATE;
+        addr = (unsigned char *)&G_MOTOR_STATE;
         size = sizeof(G_MOTOR_STATE);
         break;
     case 22:
-        addr = &G_SPEED_PROFILE;
+        addr = (unsigned char *)&G_SPEED_PROFILE;
         size = sizeof(G_SPEED_PROFILE);
         break;
     case 23:
-        addr = &G_SPEED_PROFILE_LOCK;
+        addr = (unsigned char *)&G_SPEED_PROFILE_LOCK;
         size = sizeof(G_SPEED_PROFILE_LOCK);
         break;
     case 24:
-        addr = &G_STEP_PROFILE;
+        addr = (unsigned char *)&G_STEP_PROFILE;
         size = sizeof(G_STEP_PROFILE);
         break;
     case 25:
-        addr = &G_STEP_PROFILE_LOCK;
+        addr = (unsigned char *)&G_STEP_PROFILE_LOCK;
         size = sizeof(G_STEP_PROFILE_LOCK);
         break;
 
     // Motor status
     case 26:
-        addr = &G_CUR_NUM_STEPS;
+        addr = (unsigned char *)&G_CUR_NUM_STEPS;
         size = sizeof(G_CUR_NUM_STEPS);
         break;
     case 27:
-        addr = &G_CUR_SPEED;
+        addr = (unsigned char *)&G_CUR_SPEED;
         size = sizeof(G_CUR_SPEED);
         break;
     case 28:
-        addr = &G_CUR_SPEED_TEMP;
+        addr = (unsigned char *)&G_CUR_SPEED_TEMP;
         size = sizeof(G_CUR_SPEED_TEMP);
         break;
     case 29:
-        addr = &G_SPEED_INCR;
+        addr = (unsigned char *)&G_SPEED_INCR;
         size = sizeof(G_SPEED_INCR);
         break;
     case 30:
-        addr = &G_ACCEL_FLAG;
+        addr = (unsigned char *)&G_ACCEL_FLAG;
         size = sizeof(G_ACCEL_FLAG);
         break;
 
     // DRV8711 GPIO
     case 31:
-        addr = &G_nSLEEP;
+        addr = (unsigned char *)&G_nSLEEP;
         size = sizeof(G_nSLEEP);
         break;
     case 32:
-        addr = &G_RESET;
+        addr = (unsigned char *)&G_RESET;
         size = sizeof(G_RESET);
         break;
     case 33:
-        addr = &G_STEP_AIN1;
+        addr = (unsigned char *)&G_STEP_AIN1;
         size = sizeof(G_STEP_AIN1);
         break;
     case 34:
-        addr = &G_DIR_AIN2;
+        addr = (unsigned char *)&G_DIR_AIN2;
         size = sizeof(G_DIR_AIN2);
         break;
     case 35:
-        addr = &G_BIN2;
+        addr = (unsigned char *)&G_BIN2;
         size = sizeof(G_BIN2);
         break;
     case 36:
-        addr = &G_BIN1;
+        addr = (unsigned char *)&G_BIN1;
         size = sizeof(G_BIN1);
         break;
     case 37:
-        addr = &G_nFAULT;
+        addr = (unsigned char *)&G_nFAULT;
         size = sizeof(G_nFAULT);
         break;
     case 38:
-        addr = &G_nSTALL;
+        addr = (unsigned char *)&G_nSTALL;
         size = sizeof(G_nSTALL);
         break;
     default:
@@ -339,15 +338,13 @@ MemAccessCmd (int RW)
     int i;
     for (i = 0; i < MAUsToRead; i++) {
         switch (RW) {
-        case READ:          // TODO Modify here to assign variables
-            //dataChar = *(addr + i);
+        case READ:
             dataChar = ReadVar (addr, i);
             WriteByteToCOM (dataChar);
             break;
         case WRITE:
         default:
             dataChar = GetWriteCmdDataMAU (i);
-            //*(addr + i) = dataChar;
             WriteVar (addr, i, dataChar);
             break;
         }
