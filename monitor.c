@@ -256,6 +256,8 @@ ReadVar (int id,
     return *VarAddr (id, offset, false);
 }
 
+// TODO Create function to inform size of variables
+
 // Override these depends on target
 void
 WriteByteToCOM (unsigned char c)
