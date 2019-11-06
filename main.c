@@ -53,6 +53,8 @@
  *
  */
 
+// TODO Replace with "msp430g2553.h"
+
 #include "msp430.h"
 #include "utility.h"
 
