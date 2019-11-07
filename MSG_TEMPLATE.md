@@ -1,6 +1,9 @@
-RW_CMD                  0x80
-TRANSFER_SIZE_MASK      0x3f
+|Name               |HEX |
+|-:                 |:-  |
+|RW_CMD             |0x80|
+|TRANSFER_SIZE_MASK |0x3f|
 
+```
 IDX             1       0
 0       0       RW_CMD  invalid
         0       READ    WRITE
@@ -31,3 +34,4 @@ IDX             1       0
         0       
         0       
         0       
+```
