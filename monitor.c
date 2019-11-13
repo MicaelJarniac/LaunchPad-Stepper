@@ -230,7 +230,7 @@ unsigned char
         size = sizeof(G_nSTALL);
         break;
     default:
-        return;
+        return 0;
     }
 
     if (returnSize)
