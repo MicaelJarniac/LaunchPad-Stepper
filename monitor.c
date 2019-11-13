@@ -272,7 +272,7 @@ WriteToCmdBuffer (unsigned char  *buf,
 {
     if ((*bufIdx) < CMD_BUFFER_SIZE) {
         buf[*bufIdx] = d & BYTE_MASK;
-        (*bufIdx)++;
+        ++(*bufIdx);
         return 0;
     }
 
@@ -338,7 +338,7 @@ MemAccessCmd (int RW)
     MAUsToRead = GetTransferSize ();
 
     int i;
-    for (i = 0; i < MAUsToRead; i++) {
+    for (i = 0; i < MAUsToRead; ++i) {
         switch (RW) {
         case READ:
             dataChar = ReadVar (addr, i);

@@ -383,7 +383,7 @@ UpdateGPIO ()
             // Send 1 pulse
             P2OUT   |=  STEP_AIN1;
             int i = 0;
-            for (i = 0; i < 1000; i++)
+            for (i = 0; i < 1000; ++i)
                 __delay_cycles (1000);
             P2OUT   &= ~STEP_AIN1;
             // Setup pin for timer output
