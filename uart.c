@@ -58,9 +58,9 @@ uartInit (void)
 {
 #if HARDWARE_UART
     /* P1.1 = RXD, P1.2=TXD */
-    P1SEL |= UART_TXD | UART_RXD ;
+    P1SEL  |= UART_TXD | UART_RXD;
     /* P1.1 = RXD, P1.2=TXD */
-    P1SEL2 |= UART_TXD | UART_RXD ;
+    P1SEL2 |= UART_TXD | UART_RXD;
     /* SMCLK */
     UCA0CTL1 |= UCSSEL_2;
     /* 4MHz 9600 */
@@ -68,7 +68,7 @@ uartInit (void)
     UCA0BR0 = 208;
     UCA0BR1 = 0;
     /* Modulation UCBRSx = 1 */
-    UCA0MCTL = UCBRS0;
+    UCA0MCTL  = UCBRS0;
     /* **Initialize USCI state machine** */
     UCA0CTL1 &= ~UCSWRST;
     /* Enable USCI_A0 RX interrupt */
@@ -77,7 +77,7 @@ uartInit (void)
     /* Timer function for TXD/RXD pins */
     P1SEL |= UART_TXD + UART_RXD;
     /* TXD */
-    P1DIR |= UART_TXD;
+    P1DIR |=  UART_TXD;
     P1DIR &= ~UART_RXD;
 
     /* Set TXD idle as mark = '1' */
@@ -127,12 +127,12 @@ void
 TimerA_UART_tx (unsigned char byte)
 {
     while (TACCTL0 & CCIE);                 // Ensure last char got TX'd
-    TACCR0 = TAR;                           // Current state of TA counter
-    TACCR0 += UART_TBIT;                    // One bit time till first bit
-    txData = byte;                          // Load global variable
-    txData |= 0x100;                        // Add mark stop bit to TXData
+    TACCR0   = TAR;                           // Current state of TA counter
+    TACCR0  += UART_TBIT;                    // One bit time till first bit
+    txData   = byte;                          // Load global variable
+    txData  |= 0x100;                        // Add mark stop bit to TXData
     txData <<= 1;                           // Add space start bit
-    TACCTL0 = OUTMOD0 + CCIE;               // Set TXD on EQU2 (idle), Int
+    TACCTL0  = OUTMOD0 + CCIE;               // Set TXD on EQU2 (idle), Int
 }
 
 /*******************************************************************************
@@ -227,12 +227,12 @@ __interrupt void
 USCI0RX_ISR (void)
 {
     /* USCI_A0 TX buffer ready? */
-    while (!(IFG2&UCA0TXIFG));
+    while (!(IFG2 & UCA0TXIFG));
 
     /* Parse received command immediately */
     receivedDataCommand (UCA0RXBUF);
 
     /* clear LPM3 bits from 0(SR) */
-   __bic_SR_register_on_exit (LPM3_bits);
+    __bic_SR_register_on_exit (LPM3_bits);
 }
 #endif
