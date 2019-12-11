@@ -31,8 +31,8 @@ Maintained by Micael Jarniac.
 [ccs]: http://www.ti.com/tool/CCSTUDIO "Code Composer Studio"
 
 <!-- Usage -->
-[template]: MSG_TEMPLATE.md
-[steppercomms]: https://github.com/MicaelJarniac/StepperComms
+[template]: MSG_TEMPLATE.md "MSG_TEMPLATE.md file"
+[steppercomms]: https://github.com/MicaelJarniac/StepperComms "MicaelJarniac/StepperComms"
 
 <!-- Support -->
 [micael]: mailto:micael@jarniac.com "micael@jarniac.com"
