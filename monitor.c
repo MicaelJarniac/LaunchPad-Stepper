@@ -39,23 +39,20 @@
 
 #include "uart.h"
 #include "monitor.h"
+#include "utility.h"
 
 #define RW_CMD              0x80
-
-#define EXTENSION_BYTE      0x07
+#define TRANSFER_SIZE_MASK  0x3f
+#define BYTE_MASK           0xff
+#define RW_MASK             0x40
 
 // RW CMD TYPE
 #define READ                1
 #define WRITE               0
-// ENDIANNESS
-#define BIG_ENDIAN          1
-#define LITTLE_ENDIAN       0
-// ADDRESSIBLE SIZE
-#define ADDRESSIBLE_32_BIT  1
-#define ADDRESSIBLE_16_BIT  0
 // Override these depends on target:
-// CMD_BUFFER_SIZE =  5 + sizeOfMauIn8BitByte * 63
-#define CMD_BUFFER_SIZE     68 // 1 + 4 + 63 = 68
+// TODO Replace hard-coded number
+// CMD_BUFFER_SIZE =  2 + sizeOfMauIn8BitByte * 63
+#define CMD_BUFFER_SIZE     65 // 1 + 1 + 63 = 65
 
 unsigned char           gInCmdBuffer[CMD_BUFFER_SIZE];
 unsigned short          gInCmdBufferIdx = 0;
@@ -63,33 +60,209 @@ volatile unsigned short gInCmdSkipCount;
 
 void ClearBufferRelatedParam ();
 
-// Override these depends on target
-int
-GetTargetEndianness ()
+unsigned char
+*VarAddr (int  id,
+          int  offset,
+          boolean returnSize)
 {
-    return LITTLE_ENDIAN;
-}
-// Override these depends on target
-void
-Write8bitByteToCOM (unsigned char c)
-{
-    uartTxByte (c & 0xff);
-}
+    unsigned char        *addr = 0;
+    static unsigned char  size = 0;
 
-int
-GetSizeOfMAUIn8bitByte ()
-{
-    unsigned char maxMAUValue = (unsigned char)(-1);
-    switch (maxMAUValue) {
-    case 0xff:
-        return 1;
+    switch (id) {
 
-    case 0xffff:
-        return 2;
+    // GUI variables
+    case 1:
+        addr = (unsigned char *)&G_FIRMWARE_VERSION;
+        size = sizeof(G_FIRMWARE_VERSION);
+        break;
+    case 2:
+        addr = (unsigned char *)&G_FULL_SCALE_CURRENT;
+        size = sizeof(G_FULL_SCALE_CURRENT);
+        break;
+    case 3:
+        addr = (unsigned char *)&G_TORQUE_OLD;
+        size = sizeof(G_TORQUE_OLD);
+        break;
+    case 4:
+        addr = (unsigned char *)&G_ISGAIN_OLD;
+        size = sizeof(G_ISGAIN_OLD);
+        break;
+    case 5:
+        addr = (unsigned char *)&G_BYPASS_INDEXER;
+        size = sizeof(G_BYPASS_INDEXER);
+        break;
+    case 6:
+        addr = (unsigned char *)&G_BYPASS_INDEXER_OLD;
+        size = sizeof(G_BYPASS_INDEXER_OLD);
+        break;
+    case 7:
+        addr = (unsigned char *)&G_WRITE_ALL_REG;
+        size = sizeof(G_WRITE_ALL_REG);
+        break;
+    case 8:
+        addr = (unsigned char *)&G_READ_ALL_REG;
+        size = sizeof(G_READ_ALL_REG);
+        break;
+    case 9:
+        addr = (unsigned char *)&G_RESET_FAULTS;
+        size = sizeof(G_RESET_FAULTS);
+        break;
+    case 10:
+        addr = (unsigned char *)&G_MANUAL_WRITE;
+        size = sizeof(G_MANUAL_WRITE);
+        break;
+    case 11:
+        addr = (unsigned char *)&G_WRITE_ADDR;
+        size = sizeof(G_WRITE_ADDR);
+        break;
+    case 12:
+        addr = (unsigned char *)&G_WRITE_DATA;
+        size = sizeof(G_WRITE_DATA);
+        break;
+    case 13:
+        addr = (unsigned char *)&G_MANUAL_READ;
+        size = sizeof(G_MANUAL_READ);
+        break;
+    case 14:
+        addr = (unsigned char *)&G_READ_ADDR;
+        size = sizeof(G_READ_ADDR);
+        break;
+    case 15:
+        addr = (unsigned char *)&G_READ_DATA;
+        size = sizeof(G_READ_DATA);
+        break;
 
+    // Stepper motion profile
+    case 16:
+        addr = (unsigned char *)&G_START_STOP_SPEED;
+        size = sizeof(G_START_STOP_SPEED);
+        break;
+    case 17:
+        addr = (unsigned char *)&G_TARGET_SPEED;
+        size = sizeof(G_TARGET_SPEED);
+        break;
+    case 18:
+        addr = (unsigned char *)&G_ACCEL_RATE;
+        size = sizeof(G_ACCEL_RATE);
+        break;
+    case 19:
+        addr = (unsigned char *)&G_TOTAL_NUM_STEPS;
+        size = sizeof(G_TOTAL_NUM_STEPS);
+        break;
+    case 20:
+        addr = (unsigned char *)&G_STEPS_TO_ACCEL;
+        size = sizeof(G_STEPS_TO_ACCEL);
+        break;
+    case 21:
+        addr = (unsigned char *)&G_MOTOR_STATE;
+        size = sizeof(G_MOTOR_STATE);
+        break;
+    case 22:
+        addr = (unsigned char *)&G_SPEED_PROFILE;
+        size = sizeof(G_SPEED_PROFILE);
+        break;
+    case 23:
+        addr = (unsigned char *)&G_SPEED_PROFILE_LOCK;
+        size = sizeof(G_SPEED_PROFILE_LOCK);
+        break;
+    case 24:
+        addr = (unsigned char *)&G_STEP_PROFILE;
+        size = sizeof(G_STEP_PROFILE);
+        break;
+    case 25:
+        addr = (unsigned char *)&G_STEP_PROFILE_LOCK;
+        size = sizeof(G_STEP_PROFILE_LOCK);
+        break;
+
+    // Motor status
+    case 26:
+        addr = (unsigned char *)&G_CUR_NUM_STEPS;
+        size = sizeof(G_CUR_NUM_STEPS);
+        break;
+    case 27:
+        addr = (unsigned char *)&G_CUR_SPEED;
+        size = sizeof(G_CUR_SPEED);
+        break;
+    case 28:
+        addr = (unsigned char *)&G_CUR_SPEED_TEMP;
+        size = sizeof(G_CUR_SPEED_TEMP);
+        break;
+    case 29:
+        addr = (unsigned char *)&G_SPEED_INCR;
+        size = sizeof(G_SPEED_INCR);
+        break;
+    case 30:
+        addr = (unsigned char *)&G_ACCEL_FLAG;
+        size = sizeof(G_ACCEL_FLAG);
+        break;
+
+    // DRV8711 GPIO
+    case 31:
+        addr = (unsigned char *)&G_nSLEEP;
+        size = sizeof(G_nSLEEP);
+        break;
+    case 32:
+        addr = (unsigned char *)&G_RESET;
+        size = sizeof(G_RESET);
+        break;
+    case 33:
+        addr = (unsigned char *)&G_STEP_AIN1;
+        size = sizeof(G_STEP_AIN1);
+        break;
+    case 34:
+        addr = (unsigned char *)&G_DIR_AIN2;
+        size = sizeof(G_DIR_AIN2);
+        break;
+    case 35:
+        addr = (unsigned char *)&G_BIN2;
+        size = sizeof(G_BIN2);
+        break;
+    case 36:
+        addr = (unsigned char *)&G_BIN1;
+        size = sizeof(G_BIN1);
+        break;
+    case 37:
+        addr = (unsigned char *)&G_nFAULT;
+        size = sizeof(G_nFAULT);
+        break;
+    case 38:
+        addr = (unsigned char *)&G_nSTALL;
+        size = sizeof(G_nSTALL);
+        break;
     default:
         return 0;
     }
+
+    if (returnSize)
+        return &size;
+    else
+        return (addr + offset);
+}
+
+void
+WriteVar (int           id,
+          int           offset,
+          unsigned char data)
+{
+    unsigned char *addr = VarAddr (id, offset, false);
+
+    *addr = data;
+}
+
+unsigned char
+ReadVar (int id,
+         int offset)
+{
+    return *VarAddr (id, offset, false);
+}
+
+// TODO Create function to inform size of variables
+
+// Override these depends on target
+void
+WriteByteToCOM (unsigned char c)
+{
+    uartTxByte (c & BYTE_MASK);
 }
 
 int
@@ -98,18 +271,12 @@ WriteToCmdBuffer (unsigned char  *buf,
                   unsigned char   d)
 {
     if ((*bufIdx) < CMD_BUFFER_SIZE) {
-        buf[*bufIdx] = d & 0xff;
-        (*bufIdx)++;
+        buf[*bufIdx] = d & BYTE_MASK;
+        ++(*bufIdx);
         return 0;
     }
 
     return 1;
-}
-
-void
-ResetInCmdBuffer ()
-{
-    gInCmdBufferIdx = 0;
 }
 
 int
@@ -119,103 +286,37 @@ WriteByteToInCmdBuffer (unsigned char d)
 }
 
 int
-GetTransferSizeInMAU () // Transfer size refer to the words to read/write of a
-                        // given cmd, not the number of bytes for the whole cmd
-                        // packet
+GetTransferSize () // Transfer size refer to the words to read/write of a
+                   // given cmd, not the number of bytes for the whole cmd
+                   // packet
 {
-    return (gInCmdBuffer[0] & 0x3f);
+    return (gInCmdBuffer[0] & TRANSFER_SIZE_MASK);
 }
 
 int
 VerifyInputCmdHeaders ()
 {
-    return ((gInCmdBuffer[0] & 0x80) == 0x80) ? 0 : 1;
-}
-
-int
-GetInputCmdType ()
-{
-    return (gInCmdBuffer[0] & 0x80);
+    return ((gInCmdBuffer[0] & RW_CMD) == RW_CMD) ? 0 : 1;
 }
 
 int
 GetRWFlag () // Equivalent to endianness on the MAU in transmission
 {
-    int ret = ((gInCmdBuffer[0] >> 6) & 0x1);
-    return ret;
+    return ((gInCmdBuffer[0] & RW_MASK) == RW_MASK) ? 1 : 0;
 }
 
-unsigned char
-*GetInCmdAddress () // Returns a pointer to internal memory
+int
+GetInCmdAddress ()
 {
-    unsigned char *addr         = 0;
-    unsigned long  addr_value   = 0;
-    int addressSize = 4; // Always use 32bit address
-    for (int i = 0; i < addressSize; i++) {
-        addr_value |= (unsigned long)(gInCmdBuffer[1 + i] << 8 *
-                                      (addressSize - 1 - i)); // Big endian
-    }
-
-    addr = (unsigned char*) addr_value;
-    return addr;
-}
-
-void
-WriteMAUToCOM (unsigned char d)
-{
-    int MAUSize = GetSizeOfMAUIn8bitByte ();
-
-    switch (MAUSize) {
-    case 1:
-        Write8bitByteToCOM (d);
-        break;
-
-    case 2:
-        unsigned char MAU[2];
-        MAU[0] = (unsigned char)(d & 0xff);
-        MAU[1] = (unsigned char)(d >> 8);
-        if (GetTargetEndianness () == LITTLE_ENDIAN) {
-            Write8bitByteToCOM (MAU[0]);
-            Write8bitByteToCOM (MAU[1]);
-        } else {
-            Write8bitByteToCOM (MAU[1]);
-            Write8bitByteToCOM (MAU[0]);
-        }
-        break;
-
-    default: // Only handles 8bit, 16bit MAU
-        break;
-    }
+    return gInCmdBuffer[1];
 }
 
 unsigned char
 GetWriteCmdDataMAU (int idx)
 {
-    unsigned char startIdx  = 1 + 4;
+    unsigned char startIdx  = 2;
 
-    unsigned char val       = 0;
-    int MAUSize = GetSizeOfMAUIn8bitByte ();
-    int byteOffset = idx*MAUSize;
-
-    switch (MAUSize) {
-    case 1:
-        val = gInCmdBuffer[startIdx + byteOffset];
-        break;
-
-    case 2:
-        if (GetTargetEndianness () == LITTLE_ENDIAN)
-            val = (gInCmdBuffer[startIdx + byteOffset + 1] << 8 ) |
-                  gInCmdBuffer[startIdx + byteOffset];
-        else
-            val = (gInCmdBuffer[startIdx + byteOffset] |
-                   gInCmdBuffer[startIdx + byteOffset + 1] << 8);
-        break;
-
-    default: // Only handles 8bit, 16bit MAU
-        break;
-    }
-
-    return val;
+    return gInCmdBuffer[startIdx + idx];
 }
 
 void
@@ -230,20 +331,24 @@ MemAccessCmd (int RW)
 {
     unsigned short  MAUsToRead  = 0;
     unsigned char   dataChar    = 0;
-    unsigned char  *addr        = GetInCmdAddress ();
+    int             addr        = GetInCmdAddress ();
 
-    for (unsigned short j = 0; j < 1; j++)
-        Write8bitByteToCOM (gInCmdBuffer[j]);
+    WriteByteToCOM (gInCmdBuffer[0]);
 
-    MAUsToRead = GetTransferSizeInMAU ();
-    for (unsigned short i = 0; i < MAUsToRead; i++) {
-        // TODO Replace with switch
-        if (RW == READ) {
-            dataChar = *(addr + i);
-            WriteMAUToCOM (dataChar);
-        } else { // WRITE
+    MAUsToRead = GetTransferSize ();
+
+    int i;
+    for (i = 0; i < MAUsToRead; ++i) {
+        switch (RW) {
+        case READ:
+            dataChar = ReadVar (addr, i);
+            WriteByteToCOM (dataChar);
+            break;
+        case WRITE:
+        default:
             dataChar = GetWriteCmdDataMAU (i);
-            *(addr + i) = dataChar;
+            WriteVar (addr, i, dataChar);
+            break;
         }
     }
 }
@@ -251,18 +356,10 @@ MemAccessCmd (int RW)
 int
 ProcessCommand ()
 {
-    // TODO Remove redundant checks
     if (VerifyInputCmdHeaders ())
         return 1;
-
-    switch (GetInputCmdType ()) {
-    case RW_CMD:
+    else
         MemAccessCmd (GetRWFlag ());
-        break;
-
-    default:
-        return 1;
-    }
 
     return 0;
 }
@@ -278,19 +375,18 @@ receivedDataCommand (unsigned char d) // Only lower byte will be used even if
         return;
     }
 
-    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) { // Wrong input header,
-                                                       // clear cmd buffer
+    if (gInCmdBufferIdx > 0 && gInCmdSkipCount == 0) {
+        // Wrong input header, clear cmd buffer
         if (VerifyInputCmdHeaders ()) {
             ClearBufferRelatedParam ();
             return;
         }
 
         if (gInCmdBufferIdx == 1) {
-            if (GetRWFlag () == WRITE) {
-                gInCmdSkipCount = 4 - 1 + GetTransferSizeInMAU () *
-                                  GetSizeOfMAUIn8bitByte ();
-            } else
-                gInCmdSkipCount = 4 - 1;
+            if (GetRWFlag () == WRITE)
+                gInCmdSkipCount = GetTransferSize ();
+            else
+                gInCmdSkipCount = 0;
         } else {
             ProcessCommand ();
             ClearBufferRelatedParam ();

@@ -53,6 +53,8 @@
  *
  */
 
+// TODO Replace with "msp430g2553.h"
+
 #include "msp430.h"
 #include "utility.h"
 
@@ -106,7 +108,7 @@ Timer1_A1 (void)
 
     case TA1IV_TACCR1:              // Vector 2: CCR1 CCIFG
         // Increment step counter
-        G_CUR_NUM_STEPS++;
+        ++G_CUR_NUM_STEPS;
         if (G_CUR_NUM_STEPS == G_TOTAL_NUM_STEPS)
             __bic_SR_register_on_exit (LPM0_bits);
         TA1CCTL1 &= ~CCIFG;

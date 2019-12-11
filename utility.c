@@ -383,7 +383,7 @@ UpdateGPIO ()
             // Send 1 pulse
             P2OUT   |=  STEP_AIN1;
             int i = 0;
-            for (i = 0; i < 1000; i++)
+            for (i = 0; i < 1000; ++i)
                 __delay_cycles (1000);
             P2OUT   &= ~STEP_AIN1;
             // Setup pin for timer output
@@ -596,16 +596,24 @@ UpdateFullScaleCurrent ()
         (G_TORQUE_REG.TORQUE != G_TORQUE_OLD)) {
         // Parse ISGAIN
         unsigned int temp_isgain;
-        if (G_CTRL_REG.ISGAIN == 0)                 // TODO Replace with switch
+        switch (G_CTRL_REG.ISGAIN) {
+        default:
+        case 0:
             temp_isgain = 5;
-        else if (G_CTRL_REG.ISGAIN == 1)
+            break;
+
+        case 1:
             temp_isgain = 10;
-        else if (G_CTRL_REG.ISGAIN == 2)
+            break;
+
+        case 2:
             temp_isgain = 20;
-        else if (G_CTRL_REG.ISGAIN == 3)
+            break;
+
+        case 3:
             temp_isgain = 40;
-        else
-            temp_isgain = 5;
+            break;
+        }
 
         // Calculate floating point value
         G_FULL_SCALE_CURRENT = (2.75 * (float)G_TORQUE_REG.TORQUE) /
