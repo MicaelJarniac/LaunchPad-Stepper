@@ -4,6 +4,11 @@ A [MSP-EXP430G2][launchpad] _LaunchPad_ firmware to control the [BOOST-DRV8711][
 ## Installation
 The included files must be imported to a [Code Composer Studio][ccs] project correctly created for the target board.
 
+## Usage
+Read the [message template][template] for an overview of how the messages are composed.
+
+There's also an example Python script for building the messages, [StepperComms][steppercomms].
+
 ## Support
 Please email [micael@jarniac.com][micael] for support.
 
@@ -25,6 +30,10 @@ Maintained by Micael Jarniac.
 <!-- Installation -->
 [ccs]: http://www.ti.com/tool/CCSTUDIO "Code Composer Studio"
 
+<!-- Usage -->
+[template]: MSG_TEMPLATE.md
+[steppercomms]: https://github.com/MicaelJarniac/StepperComms
+
 <!-- Support -->
 [micael]: mailto:micael@jarniac.com "micael@jarniac.com"
 
@@ -35,5 +44,4 @@ Maintained by Micael Jarniac.
 [ticode]: http://www.ti.com/lit/zip/slvc575 "Example Code"
 
 <!-- License -->
-[license]: https://choosealicense.com/licenses/mit "MIT License"
-<!-- TODO Redirect to LICENSE file -->
+[license]: LICENSE "MIT License"
