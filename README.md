@@ -1,3 +1,6 @@
+[![GitHub license](https://img.shields.io/github/license/MicaelJarniac/LaunchPad-Stepper?style=flat-square)](https://github.com/MicaelJarniac/LaunchPad-Stepper/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/MicaelJarniac/LaunchPad-Stepper?style=flat-square)](https://github.com/MicaelJarniac/LaunchPad-Stepper/issues)
+
 # LaunchPad Stepper
 A [MSP-EXP430G2][launchpad] _LaunchPad_ firmware to control the [BOOST-DRV8711][stepperdriver] Stepper Motor _BoosterPack_ through a simplified UART protocol.
 
@@ -10,7 +13,7 @@ Read the [message template][template] for an overview of how the messages are co
 There's also an example Python script for building the messages, [StepperComms][steppercomms].
 
 ## Support
-Please email [micael@jarniac.com][micael] for support.
+Please email [micael@jarniac.com][mailmicael] for support.
 
 ## Contributing
 Submitted code must match the [GNOME C Coding Style][gnomestyle].
@@ -18,10 +21,7 @@ Submitted code must match the [GNOME C Coding Style][gnomestyle].
 ## Credit
 Based on the [example code][ticode] by Texas Instruments, licensed under BSD.
 
-Maintained by Micael Jarniac.
-
-## License
-[MIT License][license]
+Maintained by [Micael Jarniac][githubmicael].
 
 <!-- Description -->
 [launchpad]: http://www.ti.com/tool/MSP-EXP430G2 "MSP-EXP430G2 LaunchPad"
@@ -35,13 +35,11 @@ Maintained by Micael Jarniac.
 [steppercomms]: https://github.com/MicaelJarniac/StepperComms "MicaelJarniac/StepperComms"
 
 <!-- Support -->
-[micael]: mailto:micael@jarniac.com "micael@jarniac.com"
+[mailmicael]: mailto:micael@jarniac.com "micael@jarniac.com"
 
 <!-- Contributing -->
 [gnomestyle]: https://developer.gnome.org/programming-guidelines/stable/c-coding-style.html.en "GNOME C Coding Style"
 
 <!-- Credit -->
 [ticode]: http://www.ti.com/lit/zip/slvc575 "Example Code"
-
-<!-- License -->
-[license]: LICENSE "MIT License"
+[githubmicael]: https://github.com/MicaelJarniac
