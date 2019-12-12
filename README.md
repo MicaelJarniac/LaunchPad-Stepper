@@ -8,6 +8,25 @@ A [MSP-EXP430G2][launchpad] _LaunchPad_ firmware to control the [BOOST-DRV8711][
 ## Installation
 The included files must be imported to a [Code Composer Studio][ccs] project correctly created for the target board.
 
+1. [Download][ccsdown] and install _Code Composer Studio_ (CCS) 9+
+1. Download this repository and extract if needed
+1. Launch CCS and create a new project
+	- *File* > *New* > *CCS Project*
+		- *Target:* *MSP430G2553*
+		- *Project templates and examples:* *Empty Projects* > *Empty Project*
+1. Ensure that the new project is selected in the Project Explorer
+1. Import this repository's contents to the new project
+	- *File* > *Import...*
+		- *General* > *File System*
+			- *From directory* > *Browse...*
+			- Find and select the downloaded repository folder
+			- *Select All*
+			- Check *Overwrite existing resources without warning*
+			- Uncheck *Create top-level folder*
+			- *Finish*
+1. *Project* > *Build Project*
+1. *Flash*
+
 ## Usage
 Read the [message template][template] for an overview of how the messages are composed.
 
@@ -30,6 +49,7 @@ Maintained by [Micael Jarniac][githubmicael].
 
 <!-- Installation -->
 [ccs]: http://www.ti.com/tool/CCSTUDIO "Code Composer Studio"
+[ccsdown]: http://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html#code-composer-studio-version-9-downloads "Code Composer Studio download page"
 
 <!-- Usage -->
 [template]: MSG_TEMPLATE.md "MSG_TEMPLATE.md file"
