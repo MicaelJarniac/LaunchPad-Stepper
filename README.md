@@ -35,6 +35,12 @@ Check out [StepperComms][steppercomms], a Python script for building the message
 ## Support
 Please email [micael@jarniac.com][mailmicael] for support.
 
+## Roadmap
+- [x] Enhance code style
+- [x] Simplify communication protocol
+- [ ] Implement function to broadcast variables size
+- [ ] Implement function to broadcast variables name
+
 ## Contributing
 Submitted code must match the [GNOME C Coding Style][gnomestyle].
 
