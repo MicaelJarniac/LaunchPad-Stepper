@@ -11,26 +11,26 @@ The included files must be imported to a [Code Composer Studio][ccs] project cor
 1. [Download][ccsdown] and install _Code Composer Studio_ (CCS) 9+
 1. Download this repository and extract if needed
 1. Launch CCS and create a new project
-	- *File* > *New* > *CCS Project*
-		- *Target:* *MSP430G2553*
-		- *Project templates and examples:* *Empty Projects* > *Empty Project*
-1. Ensure that the new project is selected in the Project Explorer
+	- **File** > **New** > **CCS Project**
+		- **Target:** **MSP430G2553** (select the board you're using)
+		- **Project templates and examples:** **Empty Projects** > **Empty Project**
+1. Ensure that the new project is selected in the **Project Explorer**
 1. Import this repository's contents to the new project
-	- *File* > *Import...*
-		- *General* > *File System*
-			- *From directory* > *Browse...*
+	- **File** > **Import...**
+		- **General** > **File System**
+			- **From directory** > **Browse...**
 			- Find and select the downloaded repository folder
-			- *Select All*
-			- Check *Overwrite existing resources without warning*
-			- Uncheck *Create top-level folder*
-			- *Finish*
-1. *Project* > *Build Project*
-1. *Flash*
+			- **Select All**
+			- Check **Overwrite existing resources without warning**
+			- Uncheck **Create top-level folder**
+			- **Finish**
+1. **Project** > **Build Project**
+1. **Flash**
 
 ## Usage
 Read the [message template][template] for an overview of how the messages are composed.
 
-There's also an example Python script for building the messages, [StepperComms][steppercomms].
+Check out [StepperComms][steppercomms], a Python script for building the messages.
 
 ## Support
 Please email [micael@jarniac.com][mailmicael] for support.
