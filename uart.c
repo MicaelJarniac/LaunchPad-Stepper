@@ -99,8 +99,7 @@ uartInit (void)
  *! \return None
  *
  ******************************************************************************/
-void
-uartTxByte (unsigned char byte)
+void uartTxByte (unsigned char byte)
 {
 #if HARDWARE_UART
     /* USCI_A0 TX buffer ready? */
